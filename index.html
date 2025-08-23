@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triangle Visualization with Extended Lines</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      display: flex;
+      margin: 17px;
+      align-items: flex-start;
+    }
+    .left-column, .right-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .right-column {
+      margin-left: 17px;
+    }
+    .chart-container, .small-chart-container {
+      width: 425px;
+      display: flex;
+      flex-direction: column;
+    }
+    .table-container, .small-table-container {
+      margin-top: 17px;
+      height: 425px;
+      overflow-y: auto;
+      width: 425px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 8.5px;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 3.4px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    th:first-child, td:first-child {
+      width: 25.5px;
+    }
+    .highlight-independent {
+      background-color: #ffff99;
+    }
+    .highlight-input {
+      background-color: #90ee90;
+    }
+    input {
+      width: 51px;
+      font-size: 8.5px;
+      text-align: center;
+    }
+    .correct {
+      color: green;
+      font-weight: bold;
+    }
+    .incorrect {
+      color: red;
+    }
+    .text-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 8.5px;
+      height: 30px;
+    }
+    .download-btn {
+      margin: 10px;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .instructions {
+      margin: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+    }
+    canvas {
+      display: block;
+      box-sizing: border-box;
+      height: 425px;
+      width: 425px;
+    }
+  </style>
+</head>
+<body>
+  <div class="instructions">
+    <h2>Triangle Visualization Tool</h2>
+    <p>Press 'Delete' key to generate new random triangles. Use the Y-Axis Step Size control to adjust the grid.</p>
+    <button class="download-btn" onclick="downloadHTML()">Download HTML File</button>
+  </div>
+
+  <div class="container">
+    <div class="left-column">
+      <div class="chart-container">
+        <div class="text-container">
+          <label for="yStep">Y-Axis Step Size: </label>
+          <input type="number" id="yStep" value="0.5" step="0.1" min="0.1">
+          <button onclick="updateCharts()">Update</button>
+        </div>
+        <canvas id="myChart"></canvas>
+      </div>
+      <div class="table-container">
+        <table id="propertiesTable">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Name</th>
+              <th>Designation</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="right-column">
+      <div class="small-chart-container">
+        <div class="text-container">
+          <p>Problem Triangle (Input values in green cells)</p>
+        </div>
+        <canvas id="smallChart"></canvas>
+      </div>
+      <div class="small-table-container">
+        <table id="smallPropertiesTable">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Name</th>
+              <th>Designation</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody id="smallTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Circle points for unit circle
+    const circlePoints = [];
+    for (let theta = 0; theta <= 2 * Math.PI; theta += 0.01) {
+      circlePoints.push({ x: Math.cos(theta), y: Math.sin(theta) });
+    }
+
+    // All available triangle parameters
+    const allParameters = [
+      { name: 'Triangle side', designation: 'AB', key: 'sideAB' },
+      { name: 'Triangle side', designation: 'BC', key: 'sideBC' },
+      { name: 'Triangle side', designation: 'CA', key: 'sideAC' },
+      { name: 'Vertex angle', designation: 'BAC', key: 'angleBAC' },
+      { name: 'Vertex angle', designation: 'ABC', key: 'angleABC' },
+      { name: 'Vertex angle', designation: 'BCA', key: 'angleBCA' },
+      { name: 'Altitude length', designation: 'AAh', key: 'altitudeAAh' },
+      { name: 'Altitude length', designation: 'BBh', key: 'altitudeBBh' },
+      { name: 'Altitude length', designation: 'CCh', key: 'altitudeCCh' },
+      { name: 'Angle between side and altitude', designation: 'BAAh', key: 'angleBAAh' },
+      { name: 'Angle between side and altitude', designation: 'CBBh', key: 'angleCBBh' },
+      { name: 'Angle between side and altitude', designation: 'ACCh', key: 'angleACCh' },
+      { name: 'Bisector length', designation: 'AAb', key: 'bisectorAAb' },
+      { name: 'Bisector length', designation: 'BBb', key: 'bisectorBBb' },
+      { name: 'Bisector length', designation: 'CCb', key: 'bisectorCCb' },
+      { name: 'Angle between bisector and side', designation: 'AAbC', key: 'angleAAbC' },
+      { name: 'Angle between bisector and side', designation: 'BBbA', key: 'angleBBbA' },
+      { name: 'Angle between bisector and side', designation: 'CCbB', key: 'angleCCbB' },
+      { name: 'Median length', designation: 'AAm', key: 'medianAAm' },
+      { name: 'Median length', designation: 'BBm', key: 'medianBBm' },
+      { name: 'Median length', designation: 'CCm', key: 'medianCCm' },
+      { name: 'Angle between median and side', designation: 'AAmC', key: 'angleAAmC' },
+      { name: 'Angle between median and side', designation: 'BBmA', key: 'angleBBmA' },
+      { name: 'Angle between median and side', designation: 'CCmB', key: 'angleCCmB' },
+      { name: 'Incircle radius', designation: 'r', key: 'inradius' },
+      { name: 'Triangle area', designation: 'S', key: 'area' },
+      { name: 'Angle between bisector and median', designation: 'AAb;BBm', key: 'angleAAbBBm' },
+      { name: 'Angle between bisector and median', designation: 'BBb;CCm', key: 'angleBBbCCm' },
+      { name: 'Angle between bisector and median', designation: 'CCb;AAm', key: 'angleCCbAAm' }
+    ];
+
+    // Geometry functions
+    function isRightAngle(A, B, C) {
+      const EPSILON = 1e-10;
+      const AB = { x: B.x - A.x, y: B.y - A.y };
+      const AC = { x: C.x - A.x, y: C.y - A.y };
+      const BA = { x: A.x - B.x, y: A.y - B.y };
+      const BC = { x: C.x - B.x, y: C.y - B.y };
+      const CA = { x: A.x - C.x, y: A.y - C.y };
+      const CB = { x: B.x - C.x, y: B.y - C.y };
+      
+      const dotA = AB.x * AC.x + AB.y * AC.y;
+      const dotB = BA.x * BC.x + BA.y * BC.y;
+      const dotC = CA.x * CB.x + CA.y * CB.y;
+      
+      return Math.abs(dotA) < EPSILON || Math.abs(dotB) < EPSILON || Math.abs(dotC) < EPSILON;
+    }
+
+    function projectPointOntoLine(P, A, B) {
+      const EPSILON = 1e-10;
+      if (Math.abs(B.x - A.x) < EPSILON) {
+        return { x: A.x, y: P.y };
+      }
+      if (Math.abs(B.y - A.y) < EPSILON) {
+        return { x: P.x, y: A.y };
+      }
+      
+      const m = (B.y - A.y) / (B.x - A.x);
+      const b = A.y - m * A.x;
+      const mPerp = -1 / m;
+      const bPerp = P.y - mPerp * P.x;
+      const x = (bPerp - b) / (m - mPerp);
+      const y = m * x + b;
+      
+      return { x, y };
+    }
+
+    function getOrthocenter(A, B, C) {
+      const EPSILON = 1e-10;
+      const AB = { x: B.x - A.x, y: B.y - A.y };
+      const AC = { x: C.x - A.x, y: C.y - A.y };
+      const BA = { x: A.x - B.x, y: A.y - B.y };
+      const BC = { x: C.x - B.x, y: C.y - B.y };
+      const CA = { x: A.x - C.x, y: A.y - C.y };
+      const CB = { x: B.x - C.x, y: B.y - C.y };
+      
+      const dotA = AB.x * AC.x + AB.y * AC.y;
+      const dotB = BA.x * BC.x + BA.y * BC.y;
+      const dotC = CA.x * CB.x + CA.y * CB.y;
+      
+      if (Math.abs(dotA) < EPSILON) return A;
+      if (Math.abs(dotB) < EPSILON) return B;
+      if (Math.abs(dotC) < EPSILON) return C;
+      
+      const mAB = (B.y - A.y) / (B.x - A.x);
+      const mAC = (C.y - A.y) / (C.x - A.x);
+      const mAltC = Math.abs(mAB) < EPSILON ? Infinity : -1 / mAB;
+      const mAltB = Math.abs(mAC) < EPSILON ? Infinity : -1 / mAC;
+      const bAltC = mAltC === Infinity ? Infinity : C.y - mAltC * C.x;
+      const bAltB = mAltB === Infinity ? Infinity : B.y - mAltB * B.x;
+      
+      if (mAltC === Infinity) {
+        return { x: C.x, y: mAltB * C.x + bAltB };
+      } else if (mAltB === Infinity) {
+        return { x: B.x, y: mAltC * B.x + bAltC };
+      } else {
+        const x = (bAltB - bAltC) / (mAltC - mAltB);
+        const y = mAltC * x + bAltC;
+        return { x, y };
+      }
+    }
+
+    function shouldExtendLine(A, B, P) {
+      const dotProduct = (P.x - A.x) * (B.x - A.x) + (P.y - A.y) * (B.y - A.y);
+      const squaredLength = (B.x - A.x) ** 2 + (B.y - A.y) ** 2;
+      return dotProduct < 0 || dotProduct > squaredLength;
+    }
+
+    function getExtendedLine(A, B, P) {
+      const distAP = Math.sqrt((P.x - A.x) ** 2 + (P.y - A.y) ** 2);
+      const distBP = Math.sqrt((P.x - B.x) ** 2 + (P.y - B.y) ** 2);
+      return distAP < distBP ? [A, P] : [B, P];
+    }
+
+    function getRandomPoints() {
+      const steps = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+      const indexA = Math.floor(Math.random() * (steps.length - 2));
+      const angleADeg = steps[indexA];
+      const angleARad = angleADeg * Math.PI / 180;
+      
+      const availableStepsB = steps.filter(angle => angle > angleADeg);
+      const indexB = Math.floor(Math.random() * (availableStepsB.length - 1));
+      const angleBDeg = availableStepsB[indexB];
+      const angleBRad = angleBDeg * Math.PI / 180;
+      
+      const availableStepsC = steps.filter(angle => angle > angleBDeg);
+      const angleCDeg = availableStepsC[Math.floor(Math.random() * availableStepsC.length)];
+      const angleCRad = angleCDeg * Math.PI / 180;
+      
+      return {
+        pointA: { x: Math.cos(angleARad), y: Math.sin(angleARad) },
+        pointB: { x: Math.cos(angleBRad), y: Math.sin(angleBRad) },
+        pointC: { x: Math.cos(angleCRad), y: Math.sin(angleCRad) }
+      };
+    }
+
+    function getRandomParameters(A, B, C, numParams = 5) {
+      let paramsValid = false;
+      let selectedParams, independent;
+      while (!paramsValid) {
+        const shuffled = allParameters.sort(() => 0.5 - Math.random());
+        selectedParams = shuffled.slice(0, numParams);
+        const independentIndices = [];
+        while (independentIndices.length < 2 && numParams >= 2) {
+          const index = Math.floor(Math.random() * numParams);
+          if (!independentIndices.includes(index)) independentIndices.push(index);
+        }
+        independent = independentIndices.map(i => selectedParams[i].key);
+        const independentParams = selectedParams.filter(p => independent.includes(p.key));
+        const inputParams = selectedParams.filter(p => !independent.includes(p.key));
+        selectedParams = [...independentParams, ...inputParams];
+
+        const values = getOrthocenterAndIntersections(A, B, C);
+        paramsValid = selectedParams.every(param => {
+          const value = values[param.key];
+          return value !== undefined && !isNaN(value) && isFinite(value);
+        });
+      }
+      return { selectedParams, independent };
+    }
+
+    function getAngleBisector(vertex, sidePoint1, sidePoint2) {
+      const EPSILON = 1e-10;
+      const vector1 = { x: sidePoint1.x - vertex.x, y: sidePoint1.y - vertex.y };
+      const vector2 = { x: sidePoint2.x - vertex.x, y: sidePoint2.y - vertex.y };
+      const mag1 = Math.sqrt(vector1.x ** 2 + vector1.y ** 2);
+      const mag2 = Math.sqrt(vector2.x ** 2 + vector2.y ** 2);
+      const unit1 = { x: vector1.x / mag1, y: vector1.y / mag1 };
+      const unit2 = { x: vector2.x / mag2, y: vector2.y / mag2 };
+      const bisectorDir = { x: unit1.x + unit2.x, y: unit1.y + unit2.y };
+      const magBisector = Math.sqrt(bisectorDir.x ** 2 + bisectorDir.y ** 2);
+      const unitBisector = magBisector < EPSILON ? { x: 0, y: 0 } : { x: bisectorDir.x / magBisector, y: bisectorDir.y / magBisector };
+      const mBisector = Math.abs(unitBisector.x) < EPSILON ? Infinity : unitBisector.y / unitBisector.x;
+      const bBisector = mBisector === Infinity ? Infinity : vertex.y - mBisector * vertex.x;
+      const mSide = Math.abs(sidePoint2.x - sidePoint1.x) < EPSILON ? Infinity : (sidePoint2.y - sidePoint1.y) / (sidePoint2.x - sidePoint1.x);
+      const bSide = mSide === Infinity ? Infinity : sidePoint1.y - mSide * sidePoint1.x;
+      let intersection;
+      if (mBisector === Infinity) {
+        const x = vertex.x;
+        const y = mSide === Infinity ? sidePoint1.y : mSide * x + bSide;
+        intersection = { x, y };
+      } else if (mSide === Infinity) {
+        const x = sidePoint1.x;
+        const y = mBisector * x + bBisector;
+        intersection = { x, y };
+      } else {
+        const x = Math.abs(mBisector - mSide) < EPSILON ? sidePoint1.x : (bSide - bBisector) / (mBisector - mSide);
+        const y = mBisector * x + bBisector;
+        intersection = { x, y };
+      }
+      return intersection;
+    }
+
+    function getIncenterAndIncircle(A, B, C) {
+      const a = Math.sqrt((B.x - C.x) ** 2 + (B.y - C.y) ** 2);
+      const b = Math.sqrt((A.x - C.x) ** 2 + (A.y - C.y) ** 2);
+      const c = Math.sqrt((A.x - B.x) ** 2 + (A.y - B.y) ** 2);
+      const s = (a + b + c) / 2;
+      const area = Math.sqrt(s * (s - a) * (s - b) * (s - c));
+      const incenterX = (a * A.x + b * B.x + c * C.x) / (a + b + c);
+      const incenterY = (a * A.y + b * B.y + c * C.y) / (a + b + c);
+      const incenter = { x: incenterX, y: incenterY };
+      const inradius = area / s;
+      return { incenter, a, b, c, area, inradius };
+    }
+
+    function getMedians(A, B, C) {
+      const pointAm = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
+      const pointBm = { x: (A.x + C.x) / 2, y: (A.y + C.y) / 2 };
+      const pointCm = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+      return { pointAm, pointBm, pointCm };
+    }
+
+    function getAngleBetweenLines(point1, point2, point3, point4) {
+      const EPSILON = 1e-10;
+      const vector1 = { x: point2.x - point1.x, y: point2.y - point1.y };
+      const vector2 = { x: point4.x - point3.x, y: point4.y - point3.y };
+      const mag1 = Math.sqrt(vector1.x ** 2 + vector1.y ** 2);
+      const mag2 = Math.sqrt(vector2.x ** 2 + vector2.y ** 2);
+      const dotProduct = vector1.x * vector2.x + vector1.y * vector2.y;
+      return mag1 * mag2 < EPSILON ? undefined : (Math.acos(Math.abs(dotProduct) / (mag1 * mag2)) * 180 / Math.PI).toFixed(2);
+    }
+
+    function getOrthocenterAndIntersections(A, B, C) {
+      const EPSILON = 1e-10;
+      const orthocenter = getOrthocenter(A, B, C);
+      const pointAh = projectPointOntoLine(A, B, C);
+      const pointBh = projectPointOntoLine(B, A, C);
+      const pointCh = projectPointOntoLine(C, A, B);
+      
+      const pointAb = getAngleBisector(A, B, C);
+      const pointBb = getAngleBisector(B, A, C);
+      const pointCb = getAngleBisector(C, A, B);
+      const { pointAm, pointBm, pointCm } = getMedians(A, B, C);
+      const { incenter, a, b, c, area, inradius } = getIncenterAndIncircle(A, B, C);
+      const sideAB = Math.sqrt((A.x - B.x) ** 2 + (A.y - B.y) ** 2).toFixed(2);
+      const sideBC = Math.sqrt((B.x - C.x) ** 2 + (B.y - C.y) ** 2).toFixed(2);
+      const sideAC = Math.sqrt((A.x - C.x) ** 2 + (A.y - C.y) ** 2).toFixed(2);
+      const angleBAC = (Math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c)) * 180 / Math.PI).toFixed(2);
+      const angleABC = (Math.acos((a ** 2 + c ** 2 - b ** 2) / (2 * a * c)) * 180 / Math.PI).toFixed(2);
+      const angleBCA = (Math.acos((a ** 2 + b ** 2 - c ** 2) / (2 * a * b)) * 180 / Math.PI).toFixed(2);
+      const altitudeAAh = Math.sqrt((A.x - pointAh.x) ** 2 + (A.y - pointAh.y) ** 2).toFixed(2);
+      const altitudeBBh = Math.sqrt((B.x - pointBh.x) ** 2 + (B.y - pointBh.y) ** 2).toFixed(2);
+      const altitudeCCh = Math.sqrt((C.x - pointCh.x) ** 2 + (C.y - pointCh.y) ** 2).toFixed(2);
+      const angleBAAh = getAngleBetweenLines(A, B, pointAh, A);
+      const angleCBBh = getAngleBetweenLines(B, C, pointBh, B);
+      const angleACCh = getAngleBetweenLines(A, C, pointCh, C);
+      const bisectorAAb = Math.sqrt((A.x - pointAb.x) ** 2 + (A.y - pointAb.y) ** 2).toFixed(2);
+      const bisectorBBb = Math.sqrt((B.x - pointBb.x) ** 2 + (B.y - pointBb.y) ** 2).toFixed(2);
+      const bisectorCCb = Math.sqrt((C.x - pointCb.x) ** 2 + (C.y - pointCb.y) ** 2).toFixed(2);
+      const angleAAbC = getAngleBetweenLines(pointAb, A, A, C);
+      const angleBBbA = getAngleBetweenLines(pointBb, B, B, A);
+      const angleCCbB = getAngleBetweenLines(pointCb, C, C, B);
+      const medianAAm = Math.sqrt((A.x - pointAm.x) ** 2 + (A.y - pointAm.y) ** 2).toFixed(2);
+      const medianBBm = Math.sqrt((B.x - pointBm.x) ** 2 + (B.y - pointBm.y) ** 2).toFixed(2);
+      const medianCCm = Math.sqrt((C.x - pointCm.x) ** 2 + (C.y - pointCm.y) ** 2).toFixed(2);
+      const angleAAmC = getAngleBetweenLines(pointAm, A, A, C);
+      const angleBBmA = getAngleBetweenLines(pointBm, B, B, A);
+      const angleCCmB = getAngleBetweenLines(pointCm, C, C, B);
+      const angleAAbBBm = getAngleBetweenLines(pointAb, A, pointBm, B);
+      const angleBBbCCm = getAngleBetweenLines(pointBb, B, pointCm, C);
+      const angleCCbAAm = getAngleBetweenLines(pointCb, C, pointAm, A);
+      return {
+        orthocenter, pointAh, pointBh, pointCh, pointAb, pointBb, pointCb, pointAm, pointBm, pointCm, incenter,
+        sideAB, sideBC, sideAC, angleBAC, angleABC, angleBCA,
+        altitudeAAh, altitudeBBh, altitudeCCh, angleBAAh, angleCBBh, angleACCh,
+        bisectorAAb, bisectorBBb, bisectorCCb, angleAAbC, angleBBbA, angleCCbB,
+        medianAAm, medianBBm, medianCCm, angleAAmC, angleBBmA, angleCCmB,
+        angleAAbBBm, angleBBbCCm, angleCCbAAm, inradius: inradius.toFixed(2), area: area.toFixed(2)
+      };
+    }
+
+    function getIncirclePoints(incenter, inradius) {
+      const points = [];
+      for (let theta = 0; theta <= 2 * Math.PI; theta += 0.01) {
+        points.push({
+          x: incenter.x + inradius * Math.cos(theta),
+          y: incenter.y + inradius * Math.sin(theta)
+        });
+      }
+      return points;
+    }
+
+    function getChartDatasets(isSmall = false) {
+      const points = isSmall ? { pointA: smallPointA, pointB: smallPointB, pointC: smallPointC } : { pointA, pointB, pointC };
+      const params = isSmall ? tableSelectedParams : allParameters;
+      const dataValues = isSmall ? smallValues : values;
+      const { orthocenter, pointAh, pointBh, pointCh, pointAb, pointBb, pointCb, pointAm, pointBm, pointCm, incenter } = dataValues;
+
+      const datasets = [
+        {
+          label: 'Unit Circle',
+          data: circlePoints,
+          borderColor: '#1e90ff',
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }
+      ];
+
+      if (isSmall) {
+        // Собираем элементы, которые нужно показать
+        const elementsToShow = {
+          A: false, B: false, C: false,
+          AB: false, BC: false, AC: false,
+          AAh: false, BBh: false, CCh: false,
+          AAb: false, BBb: false, CCb: false,
+          AAm: false, BBm: false, CCm: false,
+          inradius: false
+        };
+
+        // Анализируем параметры для определения нужных элементов
+        params.forEach(param => {
+          if (param.key.includes('sideAB')) elementsToShow.AB = true;
+          if (param.key.includes('sideBC')) elementsToShow.BC = true;
+          if (param.key.includes('sideAC')) elementsToShow.AC = true;
+          
+          if (param.key.includes('A') && !param.key.includes('Ah') && !param.key.includes('Ab') && !param.key.includes('Am')) elementsToShow.A = true;
+          if (param.key.includes('B') && !param.key.includes('Bh') && !param.key.includes('Bb') && !param.key.includes('Bm')) elementsToShow.B = true;
+          if (param.key.includes('C') && !param.key.includes('Ch') && !param.key.includes('Cb') && !param.key.includes('Cm')) elementsToShow.C = true;
+          
+          if (param.key.includes('altitudeAAh') || param.key.includes('angleBAAh')) elementsToShow.AAh = true;
+          if (param.key.includes('altitudeBBh') || param.key.includes('angleCBBh')) elementsToShow.BBh = true;
+          if (param.key.includes('altitudeCCh') || param.key.includes('angleACCh')) elementsToShow.CCh = true;
+          
+          if (param.key.includes('bisectorAAb') || param.key.includes('angleAAbC') || param.key.includes('angleAAbBBm')) elementsToShow.AAb = true;
+          if (param.key.includes('bisectorBBb') || param.key.includes('angleBBbA') || param.key.includes('angleBBbCCm')) elementsToShow.BBb = true;
+          if (param.key.includes('bisectorCCb') || param.key.includes('angleCCbB') || param.key.includes('angleCCbAAm')) elementsToShow.CCb = true;
+          
+          if (param.key.includes('medianAAm') || param.key.includes('angleAAmC') || param.key.includes('angleCCbAAm')) elementsToShow.AAm = true;
+          if (param.key.includes('medianBBm') || param.key.includes('angleBBmA') || param.key.includes('angleAAbBBm')) elementsToShow.BBm = true;
+          if (param.key.includes('medianCCm') || param.key.includes('angleCCmB') || param.key.includes('angleBBbCCm')) elementsToShow.CCm = true;
+          
+          if (param.key.includes('inradius')) elementsToShow.inradius = true;
+          
+          // Для углов добавляем соответствующие стороны
+          if (param.key === 'angleBAC') { elementsToShow.AB = true; elementsToShow.AC = true; }
+          if (param.key === 'angleABC') { elementsToShow.AB = true; elementsToShow.BC = true; }
+          if (param.key === 'angleBCA') { elementsToShow.BC = true; elementsToShow.AC = true; }
+        });
+
+        // Добавляем вершины, если они нужны
+        if (elementsToShow.A) {
+          datasets.push({
+            label: 'Point A',
+            data: [points.pointA],
+            backgroundColor: '#00ff00',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+        if (elementsToShow.B) {
+          datasets.push({
+            label: 'Point B',
+            data: [points.pointB],
+            backgroundColor: '#ff00ff',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+        if (elementsToShow.C) {
+          datasets.push({
+            label: 'Point C',
+            data: [points.pointC],
+            backgroundColor: '#00ffff',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+
+        // Добавляем стороны
+        if (elementsToShow.AB) {
+          datasets.push({
+            label: 'Side AB',
+            data: [points.pointA, points.pointB],
+            borderColor: '#000000',
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          });
+        }
+        if (elementsToShow.BC) {
+          datasets.push({
+            label: 'Side BC',
+            data: [points.pointB, points.pointC],
+            borderColor: '#000000',
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          });
+        }
+        if (elementsToShow.AC) {
+          datasets.push({
+            label: 'Side AC',
+            data: [points.pointA, points.pointC],
+            borderColor: '#000000',
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          });
+        }
+
+        // Добавляем высоты
+        if (elementsToShow.AAh) {
+          datasets.push({
+            label: 'Altitude A-Ah',
+            data: isRightAngle(points.pointA, points.pointB, points.pointC) ? [pointAh, points.pointA] : [orthocenter, pointAh, points.pointA],
+            borderColor: '#4682b4',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Ah',
+            data: [pointAh],
+            backgroundColor: '#800080',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+        if (elementsToShow.BBh) {
+          datasets.push({
+            label: 'Altitude B-Bh',
+            data: isRightAngle(points.pointB, points.pointA, points.pointC) ? [pointBh, points.pointB] : [orthocenter, pointBh, points.pointB],
+            borderColor: '#4682b4',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Bh',
+            data: [pointBh],
+            backgroundColor: '#800080',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+        if (elementsToShow.CCh) {
+          datasets.push({
+            label: 'Altitude C-Ch',
+            data: isRightAngle(points.pointC, points.pointA, points.pointB) ? [pointCh, points.pointC] : [orthocenter, pointCh, points.pointC],
+            borderColor: '#4682b4',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Ch',
+            data: [pointCh],
+            backgroundColor: '#800080',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+
+        // Добавляем биссектрисы
+        if (elementsToShow.AAb) {
+          datasets.push({
+            label: 'Bisector A-Ab',
+            data: [points.pointA, pointAb],
+            borderColor: '#ff4500',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Ab',
+            data: [pointAb],
+            backgroundColor: '#ff4500',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+        if (elementsToShow.BBb) {
+          datasets.push({
+            label: 'Bisector B-Bb',
+            data: [points.pointB, pointBb],
+            borderColor: '#ff4500',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Bb',
+            data: [pointBb],
+            backgroundColor: '#ff4500',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+        if (elementsToShow.CCb) {
+          datasets.push({
+            label: 'Bisector C-Cb',
+            data: [points.pointC, pointCb],
+            borderColor: '#ff4500',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Cb',
+            data: [pointCb],
+            backgroundColor: '#ff4500',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+
+        // Добавляем медианы
+        if (elementsToShow.AAm) {
+          datasets.push({
+            label: 'Median A-Am',
+            data: [points.pointA, pointAm],
+            borderColor: '#008000',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Am',
+            data: [pointAm],
+            backgroundColor: '#008000',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+        if (elementsToShow.BBm) {
+          datasets.push({
+            label: 'Median B-Bm',
+            data: [points.pointB, pointBm],
+            borderColor: '#008000',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Bm',
+            data: [pointBm],
+            backgroundColor: '#008000',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+        if (elementsToShow.CCm) {
+          datasets.push({
+            label: 'Median C-Cm',
+            data: [points.pointC, pointCm],
+            borderColor: '#008000',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Point Cm',
+            data: [pointCm],
+            backgroundColor: '#008000',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+
+        // Добавляем вписанную окружность
+        if (elementsToShow.inradius) {
+          datasets.push({
+            label: 'Incircle',
+            data: getIncirclePoints(incenter, dataValues.inradius),
+            borderColor: '#ff0000',
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          }, {
+            label: 'Incenter I',
+            data: [incenter],
+            backgroundColor: '#ff0000',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          });
+        }
+      } else {
+        // Оригинальный код для mainChart
+        datasets.push(
+          {
+            label: 'Side AB',
+            data: [points.pointA, points.pointB],
+            borderColor: '#000000',
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          },
+          {
+            label: 'Side BC',
+            data: [points.pointB, points.pointC],
+            borderColor: '#000000',
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          },
+          {
+            label: 'Side AC',
+            data: [points.pointA, points.pointC],
+            borderColor: '#000000',
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          },
+          {
+            label: 'Point A',
+            data: [points.pointA],
+            backgroundColor: '#00ff00',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          },
+          {
+            label: 'Point B',
+            data: [points.pointB],
+            backgroundColor: '#ff00ff',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          },
+          {
+            label: 'Point C',
+            data: [points.pointC],
+            backgroundColor: '#00ffff',
+            pointRadius: 4.25,
+            pointHoverRadius: 4.25
+          }
+        );
+
+        // Добавляем все остальные элементы для mainChart
+        if (shouldExtendLine(points.pointB, points.pointC, pointAh)) {
+          datasets.push({
+            label: 'Extended BC',
+            data: getExtendedLine(points.pointB, points.pointC, pointAh),
+            borderColor: '#000000',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          });
+        }
+
+        if (shouldExtendLine(points.pointA, points.pointC, pointBh)) {
+          datasets.push({
+            label: 'Extended AC',
+            data: getExtendedLine(points.pointA, points.pointC, pointBh),
+            borderColor: '#000000',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          });
+        }
+
+        if (shouldExtendLine(points.pointA, points.pointB, pointCh)) {
+          datasets.push({
+            label: 'Extended AB',
+            data: getExtendedLine(points.pointA, points.pointB, pointCh),
+            borderColor: '#000000',
+            borderDash: [4.25, 4.25],
+            showLine: true,
+            fill: false,
+            pointRadius: 0
+          });
+        }
+
+        datasets.push({
+          label: 'Altitude A-Ah',
+          data: isRightAngle(points.pointA, points.pointB, points.pointC) ? [pointAh, points.pointA] : [orthocenter, pointAh, points.pointA],
+          borderColor: '#4682b4',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Ah',
+          data: [pointAh],
+          backgroundColor: '#800080',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Altitude B-Bh',
+          data: isRightAngle(points.pointB, points.pointA, points.pointC) ? [pointBh, points.pointB] : [orthocenter, pointBh, points.pointB],
+          borderColor: '#4682b4',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Bh',
+          data: [pointBh],
+          backgroundColor: '#800080',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Altitude C-Ch',
+          data: isRightAngle(points.pointC, points.pointA, points.pointB) ? [pointCh, points.pointC] : [orthocenter, pointCh, points.pointC],
+          borderColor: '#4682b4',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Ch',
+          data: [pointCh],
+          backgroundColor: '#800080',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Bisector A-Ab',
+          data: [points.pointA, pointAb],
+          borderColor: '#ff4500',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Ab',
+          data: [pointAb],
+          backgroundColor: '#ff4500',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Bisector B-Bb',
+          data: [points.pointB, pointBb],
+          borderColor: '#ff4500',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Bb',
+          data: [pointBb],
+          backgroundColor: '#ff4500',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Bisector C-Cb',
+          data: [points.pointC, pointCb],
+          borderColor: '#ff4500',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Cb',
+          data: [pointCb],
+          backgroundColor: '#ff4500',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Median A-Am',
+          data: [points.pointA, pointAm],
+          borderColor: '#008000',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Am',
+          data: [pointAm],
+          backgroundColor: '#008000',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Median B-Bm',
+          data: [points.pointB, pointBm],
+          borderColor: '#008000',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Bm',
+          data: [pointBm],
+          backgroundColor: '#008000',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Median C-Cm',
+          data: [points.pointC, pointCm],
+          borderColor: '#008000',
+          borderDash: [4.25, 4.25],
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Point Cm',
+          data: [pointCm],
+          backgroundColor: '#008000',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        }, {
+          label: 'Incircle',
+          data: getIncirclePoints(incenter, dataValues.inradius),
+          borderColor: '#ff0000',
+          showLine: true,
+          fill: false,
+          pointRadius: 0
+        }, {
+          label: 'Incenter I',
+          data: [incenter],
+          backgroundColor: '#ff0000',
+          pointRadius: 4.25,
+          pointHoverRadius: 4.25
+        });
+      }
+
+      return datasets;
+    }
+
+    function getChartAnnotations(isSmall = false) {
+      const points = isSmall ? { pointA: smallPointA, pointB: smallPointB, pointC: smallPointC } : { pointA, pointB, pointC };
+      const params = isSmall ? tableSelectedParams : allParameters;
+      const dataValues = isSmall ? smallValues : values;
+      const { orthocenter, pointAh, pointBh, pointCh, pointAb, pointBb, pointCb, pointAm, pointBm, pointCm, incenter } = dataValues;
+
+      const annotations = {};
+
+      if (!isSmall || params.some(p => p.designation.includes('A') || p.key.includes('A'))) {
+        annotations.labelA = {
+          type: 'label',
+          xValue: points.pointA.x,
+          yValue: points.pointA.y,
+          content: ['A'],
+          font: { size: 10.2 },
+          color: '#000000',
+          position: 'center',
+          xAdjust: 8.5,
+          yAdjust: -8.5
+        };
+      }
+      if (!isSmall || params.some(p => p.designation.includes('B') || p.key.includes('B'))) {
+        annotations.labelB = {
+          type: 'label',
+          xValue: points.pointB.x,
+          yValue: points.pointB.y,
+          content: ['B'],
+          font: { size: 10.2 },
+          color: '#000000',
+          position: 'center',
+          xAdjust: 8.5,
+          yAdjust: -8.5
+        };
+      }
+      if (!isSmall || params.some(p => p.designation.includes('C') || p.key.includes('C'))) {
+        annotations.labelC = {
+          type: 'label',
+          xValue: points.pointC.x,
+          yValue: points.pointC.y,
+          content: ['C'],
+          font: { size: 10.2 },
+          color: '#000000',
+          position: 'center',
+          xAdjust: 8.5,
+          yAdjust: -8.5
+        };
+      }
+
+      if ((!isSmall || params.some(p => p.key === 'inradius')) && incenter) {
+        annotations.labelI = {
+          type: 'label',
+          xValue: incenter.x,
+          yValue: incenter.y,
+          content: ['I'],
+          font: { size: 10.2 },
+          color: '#000000',
+          position: 'center',
+          xAdjust: 8.5,
+          yAdjust: -8.5
+        };
+      }
+
+      params.forEach(param => {
+        if ((!isSmall || param.key.includes('altitudeAAh') || param.key.includes('angleBAAh')) && orthocenter && pointAh) {
+          annotations.labelH = {
+            type: 'label',
+            xValue: orthocenter.x,
+            yValue: orthocenter.y,
+            content: ['H'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+          annotations.labelAh = {
+            type: 'label',
+            xValue: pointAh.x,
+            yValue: pointAh.y,
+            content: ['Ah'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+        if ((!isSmall || param.key.includes('altitudeBBh') || param.key.includes('angleCBBh')) && orthocenter && pointBh) {
+          annotations.labelH = {
+            type: 'label',
+            xValue: orthocenter.x,
+            yValue: orthocenter.y,
+            content: ['H'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+          annotations.labelBh = {
+            type: 'label',
+            xValue: pointBh.x,
+            yValue: pointBh.y,
+            content: ['Bh'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+        if ((!isSmall || param.key.includes('altitudeCCh') || param.key.includes('angleACCh')) && orthocenter && pointCh) {
+          annotations.labelH = {
+            type: 'label',
+            xValue: orthocenter.x,
+            yValue: orthocenter.y,
+            content: ['H'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+          annotations.labelCh = {
+            type: 'label',
+            xValue: pointCh.x,
+            yValue: pointCh.y,
+            content: ['Ch'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+        if ((!isSmall || param.key.includes('bisectorAAb') || param.key.includes('angleAAbC') || param.key.includes('angleAAbBBm')) && pointAb) {
+          annotations.labelAb = {
+            type: 'label',
+            xValue: pointAb.x,
+            yValue: pointAb.y,
+            content: ['Ab'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+        if ((!isSmall || param.key.includes('bisectorBBb') || param.key.includes('angleBBbA') || param.key.includes('angleBBbCCm')) && pointBb) {
+          annotations.labelBb = {
+            type: 'label',
+            xValue: pointBb.x,
+            yValue: pointBb.y,
+            content: ['Bb'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+        if ((!isSmall || param.key.includes('bisectorCCb') || param.key.includes('angleCCbB') || param.key.includes('angleCCbAAm')) && pointCb) {
+          annotations.labelCb = {
+            type: 'label',
+            xValue: pointCb.x,
+            yValue: pointCb.y,
+            content: ['Cb'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+        if ((!isSmall || param.key.includes('medianAAm') || param.key.includes('angleAAmC') || param.key.includes('angleCCbAAm')) && pointAm) {
+          annotations.labelAm = {
+            type: 'label',
+            xValue: pointAm.x,
+            yValue: pointAm.y,
+            content: ['Am'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+        if ((!isSmall || param.key.includes('medianBBm') || param.key.includes('angleBBmA') || param.key.includes('angleAAbBBm')) && pointBm) {
+          annotations.labelBm = {
+            type: 'label',
+            xValue: pointBm.x,
+            yValue: pointBm.y,
+            content: ['Bm'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+        if ((!isSmall || param.key.includes('medianCCm') || param.key.includes('angleCCmB') || param.key.includes('angleBBbCCm')) && pointCm) {
+          annotations.labelCm = {
+            type: 'label',
+            xValue: pointCm.x,
+            yValue: pointCm.y,
+            content: ['Cm'],
+            font: { size: 10.2 },
+            color: '#000000',
+            position: 'center',
+            xAdjust: 8.5,
+            yAdjust: -8.5
+          };
+        }
+      });
+
+      return annotations;
+    }
+
+    function updateMainTable() {
+      const tableBody = document.getElementById('tableBody');
+      tableBody.innerHTML = '';
+      let remainingParams = allParameters.filter(param => !tableSelectedParams.some(selected => selected.key === param.key));
+      let displayedParams = [...tableSelectedParams, ...remainingParams];
+
+      displayedParams.forEach((param, index) => {
+        const row = document.createElement('tr');
+        if (index < 2 && tableIndependent.includes(param.key)) {
+          row.classList.add('highlight-independent');
+        } else if (index >= 2 && index < 5 && !tableIndependent.includes(param.key)) {
+          row.classList.add('highlight-input');
+        }
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${param.name}</td>
+          <td>${param.designation}</td>
+          <td>${values[param.key]}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function updateSmallTable() {
+      const tableBody = document.getElementById('smallTableBody');
+      tableBody.innerHTML = '';
+      tableSelectedParams.forEach((param, index) => {
+        const isIndependent = tableIndependent.includes(param.key);
+        const row = document.createElement('tr');
+        if (isIndependent && index < 2) {
+          row.classList.add('highlight-independent');
+        } else if (!isIndependent && index >= 2) {
+          row.classList.add('highlight-input');
+        }
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${param.name}</td>
+          <td>${param.designation}</td>
+          <td id="${param.key}Cell">${isIndependent ? values[param.key] : `<input type="number" id="${param.key}" step="0.01">`}</td>
+        `;
+        tableBody.appendChild(row);
+
+        if (!isIndependent) {
+          document.getElementById(param.key).addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+              const inputValue = parseFloat(event.target.value);
+              const correctValue = parseFloat(values[param.key]);
+              const cell = document.getElementById(`${param.key}Cell`);
+              if (isNaN(inputValue)) {
+                cell.innerHTML = `<span class="incorrect">Wrong</span>`;
+                return;
+              }
+              const absoluteError = Math.abs(inputValue - correctValue);
+              if (absoluteError >= 0.01) {
+                const relativeError = absoluteError / correctValue;
+                if (relativeError <= 0.05) {
+                  cell.innerHTML = `<span class="correct">${inputValue.toFixed(2)}</span>`;
+                } else {
+                  cell.innerHTML = `<span class="incorrect">Wrong</span>`;
+                }
+              } else {
+                if (absoluteError <= 0.01) {
+                  cell.innerHTML = `<span class="correct">${inputValue.toFixed(2)}</span>`;
+                } else {
+                  cell.innerHTML = `<span class="incorrect">Wrong</span>`;
+                }
+              }
+            }
+          });
+        }
+      });
+    }
+
+    function downloadHTML() {
+      const htmlContent = `<!DOCTYPE html>${document.documentElement.outerHTML}`;
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'triangle_visualization_with_extensions.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Initialize with random points
+    let { pointA, pointB, pointC } = getRandomPoints();
+    let { pointA: smallPointA, pointB: smallPointB, pointC: smallPointC } = getRandomPoints();
+    let tableParams = getRandomParameters(pointA, pointB, pointC, 5);
+    let tableSelectedParams = tableParams.selectedParams;
+    let tableIndependent = tableParams.independent;
+    let values = getOrthocenterAndIntersections(pointA, pointB, pointC);
+    let smallValues = getOrthocenterAndIntersections(smallPointA, smallPointB, smallPointC);
+
+    // Initialize charts
+    updateMainTable();
+    updateSmallTable();
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const smallCtx = document.getElementById('smallChart').getContext('2d');
+    let chart = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: getChartDatasets()
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'linear',
+            min: -1.5,
+            max: 1.5,
+            title: { display: true, text: 'x' }
+          },
+          y: {
+            type: 'linear',
+            min: -1.5,
+            max: 1.5,
+            ticks: { stepSize: 0.5 },
+            title: { display: true, text: 'y' }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false },
+          annotation: {
+            annotations: getChartAnnotations()
+          }
+        },
+        aspectRatio: 1
+      }
+    });
+
+    let smallChart = new Chart(smallCtx, {
+      type: 'scatter',
+      data: {
+        datasets: getChartDatasets(true)
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'linear',
+            min: -1.5,
+            max: 1.5,
+            title: { display: true, text: 'x' }
+          },
+          y: {
+            type: 'linear',
+            min: -1.5,
+            max: 1.5,
+            ticks: { stepSize: 0.5 },
+            title: { display: true, text: 'y' }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false },
+          annotation: {
+            annotations: getChartAnnotations(true)
+          }
+        },
+        aspectRatio: 1
+      }
+    });
+
+    function updateCharts() {
+      const yStep = parseFloat(document.getElementById('yStep').value);
+      chart.options.scales.y.ticks.stepSize = yStep;
+      smallChart.options.scales.y.ticks.stepSize = yStep;
+      chart.update();
+      smallChart.update();
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Delete') {
+        const mainPoints = getRandomPoints();
+        pointA = mainPoints.pointA;
+        pointB = mainPoints.pointB;
+        pointC = mainPoints.pointC;
+        const smallPoints = getRandomPoints();
+        smallPointA = smallPoints.pointA;
+        smallPointB = smallPoints.pointB;
+        smallPointC = smallPoints.pointC;
+        tableParams = getRandomParameters(pointA, pointB, pointC, 5);
+        tableSelectedParams = tableParams.selectedParams;
+        tableIndependent = tableParams.independent;
+        values = getOrthocenterAndIntersections(pointA, pointB, pointC);
+        smallValues = getOrthocenterAndIntersections(smallPointA, smallPointB, smallPointC);
+
+        updateMainTable();
+        updateSmallTable();
+        chart.data.datasets = getChartDatasets();
+        chart.options.plugins.annotation.annotations = getChartAnnotations();
+        smallChart.data.datasets = getChartDatasets(true);
+        smallChart.options.plugins.annotation.annotations = getChartAnnotations(true);
+        chart.update();
+        smallChart.update();
+      }
+    });
+  </script>
+</body>
+</html>
