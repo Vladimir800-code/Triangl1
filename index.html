@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="ru" class="translated-ltr"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Triangle Visualization with Extended Lines</title>
+  <title>Визуализация треугольника с помощью удлиненных линий</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
   <style>
@@ -98,56 +96,226 @@
       width: 425px;
     }
   </style>
-</head>
-<body>
+<link type="text/css" rel="stylesheet" charset="UTF-8" href="https://www.gstatic.com/_/translate_http/_/ss/k=translate_http.tr.pgV-E-68K-A.L.W.O/am=gMA/d=0/rs=AN8SPfpszKJssl6IA0boGClFdsaAZGtXEQ/m=el_main_css"></head>
+<body data-new-gr-c-s-check-loaded="14.1251.0" data-gr-ext-installed="">
   <div class="instructions">
-    <h2>Triangle Visualization Tool</h2>
-    <p>Press 'Delete' key to generate new random triangles. Use the Y-Axis Step Size control to adjust the grid.</p>
-    <button class="download-btn" onclick="downloadHTML()">Download HTML File</button>
+    <h2><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Инструмент визуализации треугольника</font></font></h2>
+    <p><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Нажмите клавишу «Delete», чтобы создать новые случайные треугольники. Используйте регулятор «Размер шага по оси Y» для настройки сетки.</font></font></p>
+    <button class="download-btn" onclick="downloadHTML()"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Загрузить HTML-файл</font></font></button>
   </div>
 
   <div class="container">
     <div class="left-column">
       <div class="chart-container">
         <div class="text-container">
-          <label for="yStep">Y-Axis Step Size: </label>
+          <label for="yStep"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Размер шага по оси Y:</font></font></label>
           <input type="number" id="yStep" value="0.5" step="0.1" min="0.1">
-          <button onclick="updateCharts()">Update</button>
+          <button onclick="updateCharts()"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Обновлять</font></font></button>
         </div>
-        <canvas id="myChart"></canvas>
+        <canvas id="myChart" width="561" height="561" style="display: block; box-sizing: border-box; height: 425px; width: 425px;"></canvas>
       </div>
       <div class="table-container">
         <table id="propertiesTable">
           <thead>
             <tr>
-              <th>No</th>
-              <th>Name</th>
-              <th>Designation</th>
-              <th>Value</th>
+              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Нет</font></font></th>
+              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Имя</font></font></th>
+              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Обозначение</font></font></th>
+              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Ценить</font></font></th>
             </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="tableBody"><tr class="highlight-independent">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Радиус вписанной окружности</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">р</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,12</font></font></td>
+        </tr><tr class="highlight-independent">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">2</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол при вершине</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">БКА</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">30.00</font></font></td>
+        </tr><tr class="highlight-input">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">3</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Медианная длина</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ББМ</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,37</font></font></td>
+        </tr><tr class="highlight-input">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">4</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина биссектрисы</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCb</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,73</font></font></td>
+        </tr><tr class="highlight-input">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">5</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина по высоте</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ББХ</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,26</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">6</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между стороной и высотой</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Бааа</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">45.00</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">7</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и медианой</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCb;AAm</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">21.21</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">8</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Треугольная сторона</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">АБ</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1.00</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">9</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и медианой</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААб;ББм</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">37.50</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">10</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между медианой и стороной</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCmB</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">22.09</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">11</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Треугольная сторона</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Калифорния</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1.41</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">12</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Треугольная сторона</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">до н.э.</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,52</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">13</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и стороной</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">BBbA</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">67.50</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">14</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина по высоте</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">КЧ</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,37</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">15</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина по высоте</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Ааа</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,71</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">16</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между медианой и стороной</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">BBmA</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">30.00</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">17</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Медианная длина</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААм</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1.20</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">18</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и стороной</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААБК</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">7.50</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">19</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между стороной и высотой</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">АКЧ</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">75.00</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">20</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Площадь треугольника</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">С</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,18</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">21</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между медианой и стороной</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААмК</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">6.21</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">22</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между стороной и высотой</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CBBh</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">60.00</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">23</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол при вершине</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Азбука</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">135.00</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">24</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и стороной</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCbB</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">15.00</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">25</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол при вершине</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">БАК</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">15.00</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">26</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и медианой</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">BBb;CCm</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">89.59</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">27</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина биссектрисы</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААТ</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1.16</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">28</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Медианная длина</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCm</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,94</font></font></td>
+        </tr><tr>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">29</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина биссектрисы</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">BBb</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,26</font></font></td>
+        </tr></tbody>
         </table>
       </div>
     </div>
     <div class="right-column">
       <div class="small-chart-container">
         <div class="text-container">
-          <p>Problem Triangle (Input values in green cells)</p>
+          <p><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Проблемный треугольник (входные значения в зеленых ячейках)</font></font></p>
         </div>
-        <canvas id="smallChart"></canvas>
+        <canvas id="smallChart" width="561" height="561" style="display: block; box-sizing: border-box; height: 425px; width: 425px;"></canvas>
       </div>
       <div class="small-table-container">
         <table id="smallPropertiesTable">
           <thead>
             <tr>
-              <th>No</th>
-              <th>Name</th>
-              <th>Designation</th>
-              <th>Value</th>
+              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Нет</font></font></th>
+              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Имя</font></font></th>
+              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Обозначение</font></font></th>
+              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Ценить</font></font></th>
             </tr>
           </thead>
-          <tbody id="smallTableBody"></tbody>
+          <tbody id="smallTableBody"><tr class="highlight-independent">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Радиус вписанной окружности</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">р</font></font></td>
+          <td id="inradiusCell"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,12</font></font></td>
+        </tr><tr class="highlight-independent">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">2</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол при вершине</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">БКА</font></font></td>
+          <td id="angleBCACell"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">30.00</font></font></td>
+        </tr><tr class="highlight-input">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">3</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Медианная длина</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ББМ</font></font></td>
+          <td id="medianBBmCell"><input type="number" id="medianBBm" step="0.01"></td>
+        </tr><tr class="highlight-input">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">4</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина биссектрисы</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCb</font></font></td>
+          <td id="bisectorCCbCell"><input type="number" id="bisectorCCb" step="0.01"></td>
+        </tr><tr class="highlight-input">
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">5</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина по высоте</font></font></td>
+          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ББХ</font></font></td>
+          <td id="altitudeBBhCell"><input type="number" id="altitudeBBh" step="0.01"></td>
+        </tr></tbody>
         </table>
       </div>
     </div>
@@ -192,6 +360,40 @@
       { name: 'Angle between bisector and median', designation: 'BBb;CCm', key: 'angleBBbCCm' },
       { name: 'Angle between bisector and median', designation: 'CCb;AAm', key: 'angleCCbAAm' }
     ];
+// === Unify angle designations (v5): explicit mapping by param.key ===
+(function unifyAngleDesignations_v5() {
+  if (typeof allParameters === 'undefined' || !Array.isArray(allParameters)) return;
+  const map = {
+    // vertex angles
+    angleBAC: 'BA;AC',
+    angleABC: 'AB;BC',
+    angleBCA: 'BC;CA',
+    // side–altitude
+    angleBAAh: 'BA;AAh',
+    angleCBBh: 'CB;BBh',
+    angleACCh: 'AC;CCh',
+    // bisector–side
+    angleAAbC: 'AAb;AC',
+    angleBBbA: 'BBb;BA',
+    angleCCbB: 'CCb;CB',
+    // median–side
+    angleAAmC: 'AAm;AC',
+    angleBBmA: 'BBm;BA',
+    angleCCmB: 'CCm;CB',
+    // special pairs
+    angleAAbBBm: 'AAb;BBm',
+    angleBBbCCm: 'BBb;CCm',
+    angleCCbAAm: 'CCb;AAm'
+  };
+  for (let i = 0; i < allParameters.length; i++) {
+    const p = allParameters[i];
+    if (p && typeof p.key === 'string' && p.key in map) {
+      allParameters[i] = { ...p, designation: map[p.key] };
+    }
+  }
+})();
+// === End unify (v5) ===
+
 
     // Geometry functions
     function isRightAngle(A, B, C) {
@@ -1206,7 +1408,7 @@
         row.innerHTML = `
           <td>${index + 1}</td>
           <td>${param.name}</td>
-          <td>${param.designation}</td>
+          <td>${String(param.designation).replace(/,/g,';')}</td>
           <td>${values[param.key]}</td>
         `;
         tableBody.appendChild(row);
@@ -1227,7 +1429,7 @@
         row.innerHTML = `
           <td>${index + 1}</td>
           <td>${param.name}</td>
-          <td>${param.designation}</td>
+          <td>${String(param.designation).replace(/,/g,';')}</td>
           <td id="${param.key}Cell">${isIndependent ? values[param.key] : `<input type="number" id="${param.key}" step="0.01">`}</td>
         `;
         tableBody.appendChild(row);
@@ -1389,6 +1591,6 @@
         smallChart.update();
       }
     });
-  </script>
-</body>
-</html>
+  </script><div id="goog-gt-tt" class="VIpgJd-yAWNEb-L7lbkb skiptranslate" style="border-radius: 12px; margin: 0 0 0 -23px; padding: 0; font-family: 'Google Sans', Arial, sans-serif;" data-id=""><div id="goog-gt-vt" class="VIpgJd-yAWNEb-hvhgNd"><div class="VIpgJd-yAWNEb-hvhgNd-Ud7fr"><img src="https://fonts.gstatic.com/s/i/productlogos/translate/v14/24px.svg" width="24" height="24" alt=""><div class=" VIpgJd-yAWNEb-hvhgNd-IuizWc-i3jM8c " dir="ltr">Исходный текст</div></div><div class="VIpgJd-yAWNEb-hvhgNd-k77Iif"><div id="goog-gt-original-text" class="VIpgJd-yAWNEb-nVMfcd-fmcmS VIpgJd-yAWNEb-hvhgNd-axAV1"></div></div><div class="VIpgJd-yAWNEb-hvhgNd-N7Eqid ltr"><div class="VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od ltr" dir="ltr"><div class="VIpgJd-yAWNEb-hvhgNd-UTujCb">Оцените этот перевод</div><div class="VIpgJd-yAWNEb-hvhgNd-eO9mKe">Ваш отзыв поможет нам улучшить Google Переводчик</div></div><div class="VIpgJd-yAWNEb-hvhgNd-xgov5 ltr"><button id="goog-gt-thumbUpButton" type="button" class="VIpgJd-yAWNEb-hvhgNd-bgm6sf" title="Хороший перевод" aria-label="Хороший перевод" aria-pressed="false"><span id="goog-gt-thumbUpIcon"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M21 7h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 0S7.08 6.85 7 7H2v13h16c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9c0-1.1-.9-2-2-2zM7 18H4V9h3v9zm14-7l-3 7H9V8l4.34-4.34L12 9h9v2z"></path></svg></span><span id="goog-gt-thumbUpIconFilled"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M21 7h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 0S7.08 6.85 7 7v13h11c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9c0-1.1-.9-2-2-2zM5 7H1v13h4V7z"></path></svg></span></button><button id="goog-gt-thumbDownButton" type="button" class="VIpgJd-yAWNEb-hvhgNd-bgm6sf" title="Плохой перевод" aria-label="Плохой перевод" aria-pressed="false"><span id="goog-gt-thumbDownIcon"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M3 17h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 24s7.09-6.85 7.17-7h5V4H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2zM17 6h3v9h-3V6zM3 13l3-7h9v10l-4.34 4.34L12 15H3v-2z"></path></svg></span><span id="goog-gt-thumbDownIconFilled"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M3 17h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 24s7.09-6.85 7.17-7V4H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2zm16 0h4V4h-4v13z"></path></svg></span></button></div></div><div id="goog-gt-votingHiddenPane" class="VIpgJd-yAWNEb-hvhgNd-aXYTce"><form id="goog-gt-votingForm" action="//translate.googleapis.com/translate_voting?client=te_lib" method="post" target="votingFrame" class="VIpgJd-yAWNEb-hvhgNd-aXYTce"><input type="text" name="sl" id="goog-gt-votingInputSrcLang"><input type="text" name="tl" id="goog-gt-votingInputTrgLang"><input type="text" name="query" id="goog-gt-votingInputSrcText"><input type="text" name="gtrans" id="goog-gt-votingInputTrgText"><input type="text" name="vote" id="goog-gt-votingInputVote"></form><iframe name="votingFrame" frameborder="0"></iframe></div></div></div>
+
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>
