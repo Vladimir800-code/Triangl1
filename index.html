@@ -1,321 +1,86 @@
-<!DOCTYPE html><html lang="ru" class="translated-ltr"><head>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Визуализация треугольника с помощью удлиненных линий</title>
+  <title>Triangle Visualization Tool — Y Scale Slider</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    .container {
-      display: flex;
-      margin: 17px;
-      align-items: flex-start;
-    }
-    .left-column, .right-column {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .right-column {
-      margin-left: 17px;
-    }
-    .chart-container, .small-chart-container {
-      width: 425px;
-      display: flex;
-      flex-direction: column;
-    }
-    .table-container, .small-table-container {
-      margin-top: 17px;
-      height: 425px;
-      overflow-y: auto;
-      width: 425px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 8.5px;
-    }
-    th, td {
-      border: 1px solid #000;
-      padding: 3.4px;
-      text-align: center;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    th:first-child, td:first-child {
-      width: 25.5px;
-    }
-    .highlight-independent {
-      background-color: #ffff99;
-    }
-    .highlight-input {
-      background-color: #90ee90;
-    }
-    input {
-      width: 51px;
-      font-size: 8.5px;
-      text-align: center;
-    }
-    .correct {
-      color: green;
-      font-weight: bold;
-    }
-    .incorrect {
-      color: red;
-    }
-    .text-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 8.5px;
-      height: 30px;
-    }
-    .download-btn {
-      margin: 10px;
-      padding: 8px 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .instructions {
-      margin: 20px;
-      padding: 15px;
-      background-color: #f8f9fa;
-      border-radius: 5px;
-    }
-    canvas {
-      display: block;
-      box-sizing: border-box;
-      height: 425px;
-      width: 425px;
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .container { display: flex; margin: 17px; align-items: flex-start; }
+    .left-column, .right-column { flex: 1; display: flex; flex-direction: column; }
+    .right-column { margin-left: 17px; }
+    .chart-container, .small-chart-container { width: 425px; display: flex; flex-direction: column; }
+    .table-container, .small-table-container { margin-top: 17px; height: 425px; overflow-y: auto; width: 425px; }
+    table { border-collapse: collapse; width: 100%; font-size: 8.5px; }
+    th, td { border: 1px solid #000; padding: 3.4px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    th:first-child, td:first-child { width: 25.5px; }
+    .highlight-independent { background-color: #ffff99; }
+    .highlight-input { background-color: #90ee90; }
+    input[type="number"] { width: 51px; font-size: 8.5px; text-align: center; }
+    .correct { color: green; font-weight: bold; }
+    .incorrect { color: red; }
+    .text-container { display: flex; justify-content: center; align-items: center; margin-bottom: 8.5px; height: 30px; gap: 10px; }
+    .download-btn { margin: 10px; padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .instructions { margin: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px; }
+    canvas { display: block; box-sizing: border-box; height: 395px; width: 425px; }
+    /* slider */
+    .slider-wrap { display:flex; align-items:center; gap:10px; width: 100%; padding: 0 8px; }
+    input[type="range"] { width: 100%; }
+    .percent { width: 48px; text-align: right; font-size: 12px; }
   </style>
-<link type="text/css" rel="stylesheet" charset="UTF-8" href="https://www.gstatic.com/_/translate_http/_/ss/k=translate_http.tr.pgV-E-68K-A.L.W.O/am=gMA/d=0/rs=AN8SPfpszKJssl6IA0boGClFdsaAZGtXEQ/m=el_main_css"></head>
-<body data-new-gr-c-s-check-loaded="14.1251.0" data-gr-ext-installed="">
+</head>
+<body>
   <div class="instructions">
-    <h2><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Инструмент визуализации треугольника</font></font></h2>
-    <p><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Нажмите клавишу «Delete», чтобы создать новые случайные треугольники. Используйте регулятор «Размер шага по оси Y» для настройки сетки.</font></font></p>
-    <button class="download-btn" onclick="downloadHTML()"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Загрузить HTML-файл</font></font></button>
+    <h2>Triangle Visualization Tool</h2>
+    <p>Press the Delete key to generate new triangles. Use the vertical scale slider to compress/expand the drawings (including the grid) along the Y axis.</p>
+    <button class="download-btn" onclick="downloadHTML()">Download HTML File</button>
   </div>
 
   <div class="container">
     <div class="left-column">
       <div class="chart-container">
-        <div class="text-container">
-          <label for="yStep"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Размер шага по оси Y:</font></font></label>
-          <input type="number" id="yStep" value="0.5" step="0.1" min="0.1">
-          <button onclick="updateCharts()"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Обновлять</font></font></button>
+        <div class="text-container slider-wrap">
+          <label for="yScale">Vertical scale:</label>
+          <input type="range" id="yScale" min="50" max="200" step="5" value="90">
+          <span id="yScaleLabel" class="percent">90%</span>
         </div>
-        <canvas id="myChart" width="561" height="561" style="display: block; box-sizing: border-box; height: 425px; width: 425px;"></canvas>
+        <canvas id="myChart"></canvas>
       </div>
       <div class="table-container">
         <table id="propertiesTable">
           <thead>
             <tr>
-              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Нет</font></font></th>
-              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Имя</font></font></th>
-              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Обозначение</font></font></th>
-              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Ценить</font></font></th>
+              <th>No</th>
+              <th>Name</th>
+              <th>Designation</th>
+              <th>Value</th>
             </tr>
           </thead>
-          <tbody id="tableBody"><tr class="highlight-independent">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Радиус вписанной окружности</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">р</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,12</font></font></td>
-        </tr><tr class="highlight-independent">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">2</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол при вершине</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">БКА</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">30.00</font></font></td>
-        </tr><tr class="highlight-input">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">3</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Медианная длина</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ББМ</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,37</font></font></td>
-        </tr><tr class="highlight-input">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">4</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина биссектрисы</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCb</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,73</font></font></td>
-        </tr><tr class="highlight-input">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">5</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина по высоте</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ББХ</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,26</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">6</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между стороной и высотой</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Бааа</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">45.00</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">7</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и медианой</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCb;AAm</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">21.21</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">8</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Треугольная сторона</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">АБ</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1.00</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">9</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и медианой</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААб;ББм</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">37.50</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">10</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между медианой и стороной</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCmB</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">22.09</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">11</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Треугольная сторона</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Калифорния</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1.41</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">12</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Треугольная сторона</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">до н.э.</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,52</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">13</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и стороной</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">BBbA</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">67.50</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">14</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина по высоте</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">КЧ</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,37</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">15</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина по высоте</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Ааа</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,71</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">16</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между медианой и стороной</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">BBmA</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">30.00</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">17</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Медианная длина</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААм</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1.20</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">18</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и стороной</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААБК</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">7.50</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">19</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между стороной и высотой</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">АКЧ</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">75.00</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">20</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Площадь треугольника</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">С</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,18</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">21</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между медианой и стороной</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААмК</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">6.21</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">22</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между стороной и высотой</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CBBh</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">60.00</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">23</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол при вершине</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Азбука</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">135.00</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">24</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и стороной</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCbB</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">15.00</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">25</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол при вершине</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">БАК</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">15.00</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">26</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол между биссектрисой и медианой</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">BBb;CCm</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">89.59</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">27</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина биссектрисы</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ААТ</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1.16</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">28</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Медианная длина</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCm</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,94</font></font></td>
-        </tr><tr>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">29</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина биссектрисы</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">BBb</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,26</font></font></td>
-        </tr></tbody>
+          <tbody id="tableBody"></tbody>
         </table>
       </div>
     </div>
     <div class="right-column">
       <div class="small-chart-container">
         <div class="text-container">
-          <p><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Проблемный треугольник (входные значения в зеленых ячейках)</font></font></p>
+          <p>Problem Triangle (Input values in green cells)</p>
         </div>
-        <canvas id="smallChart" width="561" height="561" style="display: block; box-sizing: border-box; height: 425px; width: 425px;"></canvas>
+        <canvas id="smallChart"></canvas>
       </div>
       <div class="small-table-container">
         <table id="smallPropertiesTable">
           <thead>
             <tr>
-              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Нет</font></font></th>
-              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Имя</font></font></th>
-              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Обозначение</font></font></th>
-              <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Ценить</font></font></th>
+              <th>No</th>
+              <th>Name</th>
+              <th>Designation</th>
+              <th>Value</th>
             </tr>
           </thead>
-          <tbody id="smallTableBody"><tr class="highlight-independent">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">1</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Радиус вписанной окружности</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">р</font></font></td>
-          <td id="inradiusCell"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">0,12</font></font></td>
-        </tr><tr class="highlight-independent">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">2</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Угол при вершине</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">БКА</font></font></td>
-          <td id="angleBCACell"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">30.00</font></font></td>
-        </tr><tr class="highlight-input">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">3</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Медианная длина</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ББМ</font></font></td>
-          <td id="medianBBmCell"><input type="number" id="medianBBm" step="0.01"></td>
-        </tr><tr class="highlight-input">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">4</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина биссектрисы</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">CCb</font></font></td>
-          <td id="bisectorCCbCell"><input type="number" id="bisectorCCb" step="0.01"></td>
-        </tr><tr class="highlight-input">
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">5</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Длина по высоте</font></font></td>
-          <td><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">ББХ</font></font></td>
-          <td id="altitudeBBhCell"><input type="number" id="altitudeBBh" step="0.01"></td>
-        </tr></tbody>
+          <tbody id="smallTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -328,7 +93,7 @@
       circlePoints.push({ x: Math.cos(theta), y: Math.sin(theta) });
     }
 
-    // All available triangle parameters
+    // All available triangle parameters (unchanged, includes "Радиус описанной окружности")
     const allParameters = [
       { name: 'Triangle side', designation: 'AB', key: 'sideAB' },
       { name: 'Triangle side', designation: 'BC', key: 'sideBC' },
@@ -358,44 +123,27 @@
       { name: 'Triangle area', designation: 'S', key: 'area' },
       { name: 'Angle between bisector and median', designation: 'AAb;BBm', key: 'angleAAbBBm' },
       { name: 'Angle between bisector and median', designation: 'BBb;CCm', key: 'angleBBbCCm' },
-      { name: 'Angle between bisector and median', designation: 'CCb;AAm', key: 'angleCCbAAm' }
+      { name: 'Angle between bisector and median', designation: 'CCb;AAm', key: 'angleCCbAAm' },
+      { name: 'Радиус описанной окружности', designation: 'R', key: 'circumradius' }
     ];
-// === Unify angle designations (v5): explicit mapping by param.key ===
-(function unifyAngleDesignations_v5() {
-  if (typeof allParameters === 'undefined' || !Array.isArray(allParameters)) return;
-  const map = {
-    // vertex angles
-    angleBAC: 'BA;AC',
-    angleABC: 'AB;BC',
-    angleBCA: 'BC;CA',
-    // side–altitude
-    angleBAAh: 'BA;AAh',
-    angleCBBh: 'CB;BBh',
-    angleACCh: 'AC;CCh',
-    // bisector–side
-    angleAAbC: 'AAb;AC',
-    angleBBbA: 'BBb;BA',
-    angleCCbB: 'CCb;CB',
-    // median–side
-    angleAAmC: 'AAm;AC',
-    angleBBmA: 'BBm;BA',
-    angleCCmB: 'CCm;CB',
-    // special pairs
-    angleAAbBBm: 'AAb;BBm',
-    angleBBbCCm: 'BBb;CCm',
-    angleCCbAAm: 'CCb;AAm'
-  };
-  for (let i = 0; i < allParameters.length; i++) {
-    const p = allParameters[i];
-    if (p && typeof p.key === 'string' && p.key in map) {
-      allParameters[i] = { ...p, designation: map[p.key] };
-    }
-  }
-})();
-// === End unify (v5) ===
+    (function unifyAngleDesignations_v5() {
+      if (typeof allParameters === 'undefined' || !Array.isArray(allParameters)) return;
+      const map = {
+        angleBAC: 'BA;AC', angleABC: 'AB;BC', angleBCA: 'BC;CA',
+        angleBAAh: 'BA;AAh', angleCBBh: 'CB;BBh', angleACCh: 'AC;CCh',
+        angleAAbC: 'AAb;AC', angleBBbA: 'BBb;BA', angleCCbB: 'CCb;CB',
+        angleAAmC: 'AAm;AC', angleBBmA: 'BBm;BA', angleCCmB: 'CCm;CB',
+        angleAAbBBm: 'AAb;BBm', angleBBbCCm: 'BBb;CCm', angleCCbAAm: 'CCb;AAm'
+      };
+      for (let i = 0; i < allParameters.length; i++) {
+        const p = allParameters[i];
+        if (p && typeof p.key === 'string' && map[p.key]) {
+          allParameters[i] = { ...p, designation: map[p.key] };
+        }
+      }
+    })();
 
-
-    // Geometry functions
+    // Geometry helpers (unchanged)
     function isRightAngle(A, B, C) {
       const EPSILON = 1e-10;
       const AB = { x: B.x - A.x, y: B.y - A.y };
@@ -404,33 +152,23 @@
       const BC = { x: C.x - B.x, y: C.y - B.y };
       const CA = { x: A.x - C.x, y: A.y - C.y };
       const CB = { x: B.x - C.x, y: B.y - C.y };
-      
       const dotA = AB.x * AC.x + AB.y * AC.y;
       const dotB = BA.x * BC.x + BA.y * BC.y;
       const dotC = CA.x * CB.x + CA.y * CB.y;
-      
       return Math.abs(dotA) < EPSILON || Math.abs(dotB) < EPSILON || Math.abs(dotC) < EPSILON;
     }
-
     function projectPointOntoLine(P, A, B) {
       const EPSILON = 1e-10;
-      if (Math.abs(B.x - A.x) < EPSILON) {
-        return { x: A.x, y: P.y };
-      }
-      if (Math.abs(B.y - A.y) < EPSILON) {
-        return { x: P.x, y: A.y };
-      }
-      
+      if (Math.abs(B.x - A.x) < EPSILON) { return { x: A.x, y: P.y }; }
+      if (Math.abs(B.y - A.y) < EPSILON) { return { x: P.x, y: A.y }; }
       const m = (B.y - A.y) / (B.x - A.x);
       const b = A.y - m * A.x;
       const mPerp = -1 / m;
       const bPerp = P.y - mPerp * P.x;
       const x = (bPerp - b) / (m - mPerp);
       const y = m * x + b;
-      
       return { x, y };
     }
-
     function getOrthocenter(A, B, C) {
       const EPSILON = 1e-10;
       const AB = { x: B.x - A.x, y: B.y - A.y };
@@ -439,75 +177,62 @@
       const BC = { x: C.x - B.x, y: C.y - B.y };
       const CA = { x: A.x - C.x, y: A.y - C.y };
       const CB = { x: B.x - C.x, y: B.y - C.y };
-      
       const dotA = AB.x * AC.x + AB.y * AC.y;
       const dotB = BA.x * BC.x + BA.y * BC.y;
       const dotC = CA.x * CB.x + CA.y * CB.y;
-      
       if (Math.abs(dotA) < EPSILON) return A;
       if (Math.abs(dotB) < EPSILON) return B;
       if (Math.abs(dotC) < EPSILON) return C;
-      
       const mAB = (B.y - A.y) / (B.x - A.x);
       const mAC = (C.y - A.y) / (C.x - A.x);
       const mAltC = Math.abs(mAB) < EPSILON ? Infinity : -1 / mAB;
       const mAltB = Math.abs(mAC) < EPSILON ? Infinity : -1 / mAC;
       const bAltC = mAltC === Infinity ? Infinity : C.y - mAltC * C.x;
       const bAltB = mAltB === Infinity ? Infinity : B.y - mAltB * B.x;
-      
-      if (mAltC === Infinity) {
-        return { x: C.x, y: mAltB * C.x + bAltB };
-      } else if (mAltB === Infinity) {
-        return { x: B.x, y: mAltC * B.x + bAltC };
-      } else {
+      if (mAltC === Infinity) { return { x: C.x, y: mAltB * C.x + bAltB }; }
+      else if (mAltB === Infinity) { return { x: B.x, y: mAltC * B.x + bAltC }; }
+      else {
         const x = (bAltB - bAltC) / (mAltC - mAltB);
         const y = mAltC * x + bAltC;
         return { x, y };
       }
     }
-
     function shouldExtendLine(A, B, P) {
       const dotProduct = (P.x - A.x) * (B.x - A.x) + (P.y - A.y) * (B.y - A.y);
       const squaredLength = (B.x - A.x) ** 2 + (B.y - A.y) ** 2;
       return dotProduct < 0 || dotProduct > squaredLength;
     }
-
     function getExtendedLine(A, B, P) {
       const distAP = Math.sqrt((P.x - A.x) ** 2 + (P.y - A.y) ** 2);
       const distBP = Math.sqrt((P.x - B.x) ** 2 + (P.y - B.y) ** 2);
       return distAP < distBP ? [A, P] : [B, P];
     }
-
     function getRandomPoints() {
       const steps = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
       const indexA = Math.floor(Math.random() * (steps.length - 2));
       const angleADeg = steps[indexA];
       const angleARad = angleADeg * Math.PI / 180;
-      
       const availableStepsB = steps.filter(angle => angle > angleADeg);
       const indexB = Math.floor(Math.random() * (availableStepsB.length - 1));
       const angleBDeg = availableStepsB[indexB];
       const angleBRad = angleBDeg * Math.PI / 180;
-      
       const availableStepsC = steps.filter(angle => angle > angleBDeg);
       const angleCDeg = availableStepsC[Math.floor(Math.random() * availableStepsC.length)];
       const angleCRad = angleCDeg * Math.PI / 180;
-      
       return {
         pointA: { x: Math.cos(angleARad), y: Math.sin(angleARad) },
         pointB: { x: Math.cos(angleBRad), y: Math.sin(angleBRad) },
         pointC: { x: Math.cos(angleCRad), y: Math.sin(angleCRad) }
       };
     }
-
-    function getRandomParameters(A, B, C, numParams = 5) {
+    function getRandomParameters(A, B, C, numParams = 6) {
       let paramsValid = false;
       let selectedParams, independent;
       while (!paramsValid) {
         const shuffled = allParameters.sort(() => 0.5 - Math.random());
         selectedParams = shuffled.slice(0, numParams);
         const independentIndices = [];
-        while (independentIndices.length < 2 && numParams >= 2) {
+        while (independentIndices.length < 3 && numParams >= 2) {
           const index = Math.floor(Math.random() * numParams);
           if (!independentIndices.includes(index)) independentIndices.push(index);
         }
@@ -515,7 +240,6 @@
         const independentParams = selectedParams.filter(p => independent.includes(p.key));
         const inputParams = selectedParams.filter(p => !independent.includes(p.key));
         selectedParams = [...independentParams, ...inputParams];
-
         const values = getOrthocenterAndIntersections(A, B, C);
         paramsValid = selectedParams.every(param => {
           const value = values[param.key];
@@ -524,7 +248,6 @@
       }
       return { selectedParams, independent };
     }
-
     function getAngleBisector(vertex, sidePoint1, sidePoint2) {
       const EPSILON = 1e-10;
       const vector1 = { x: sidePoint1.x - vertex.x, y: sidePoint1.y - vertex.y };
@@ -556,7 +279,6 @@
       }
       return intersection;
     }
-
     function getIncenterAndIncircle(A, B, C) {
       const a = Math.sqrt((B.x - C.x) ** 2 + (B.y - C.y) ** 2);
       const b = Math.sqrt((A.x - C.x) ** 2 + (A.y - C.y) ** 2);
@@ -569,14 +291,12 @@
       const inradius = area / s;
       return { incenter, a, b, c, area, inradius };
     }
-
     function getMedians(A, B, C) {
       const pointAm = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
       const pointBm = { x: (A.x + C.x) / 2, y: (A.y + C.y) / 2 };
       const pointCm = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
       return { pointAm, pointBm, pointCm };
     }
-
     function getAngleBetweenLines(point1, point2, point3, point4) {
       const EPSILON = 1e-10;
       const vector1 = { x: point2.x - point1.x, y: point2.y - point1.y };
@@ -586,19 +306,17 @@
       const dotProduct = vector1.x * vector2.x + vector1.y * vector2.y;
       return mag1 * mag2 < EPSILON ? undefined : (Math.acos(Math.abs(dotProduct) / (mag1 * mag2)) * 180 / Math.PI).toFixed(2);
     }
-
     function getOrthocenterAndIntersections(A, B, C) {
-      const EPSILON = 1e-10;
       const orthocenter = getOrthocenter(A, B, C);
       const pointAh = projectPointOntoLine(A, B, C);
       const pointBh = projectPointOntoLine(B, A, C);
       const pointCh = projectPointOntoLine(C, A, B);
-      
       const pointAb = getAngleBisector(A, B, C);
       const pointBb = getAngleBisector(B, A, C);
       const pointCb = getAngleBisector(C, A, B);
       const { pointAm, pointBm, pointCm } = getMedians(A, B, C);
       const { incenter, a, b, c, area, inradius } = getIncenterAndIncircle(A, B, C);
+      const circumradius = (a * b * c) / (4 * area);
       const sideAB = Math.sqrt((A.x - B.x) ** 2 + (A.y - B.y) ** 2).toFixed(2);
       const sideBC = Math.sqrt((B.x - C.x) ** 2 + (B.y - C.y) ** 2).toFixed(2);
       const sideAC = Math.sqrt((A.x - C.x) ** 2 + (A.y - C.y) ** 2).toFixed(2);
@@ -632,763 +350,152 @@
         altitudeAAh, altitudeBBh, altitudeCCh, angleBAAh, angleCBBh, angleACCh,
         bisectorAAb, bisectorBBb, bisectorCCb, angleAAbC, angleBBbA, angleCCbB,
         medianAAm, medianBBm, medianCCm, angleAAmC, angleBBmA, angleCCmB,
-        angleAAbBBm, angleBBbCCm, angleCCbAAm, inradius: inradius.toFixed(2), area: area.toFixed(2)
+        angleAAbBBm, angleBBbCCm, angleCCbAAm, inradius: inradius.toFixed(2), area: area.toFixed(2),
+        circumradius: circumradius.toFixed(2)
       };
     }
-
     function getIncirclePoints(incenter, inradius) {
       const points = [];
       for (let theta = 0; theta <= 2 * Math.PI; theta += 0.01) {
-        points.push({
-          x: incenter.x + inradius * Math.cos(theta),
-          y: incenter.y + inradius * Math.sin(theta)
-        });
+        points.push({ x: incenter.x + inradius * Math.cos(theta), y: incenter.y + inradius * Math.sin(theta) });
       }
       return points;
     }
 
     function getChartDatasets(isSmall = false) {
       const points = isSmall ? { pointA: smallPointA, pointB: smallPointB, pointC: smallPointC } : { pointA, pointB, pointC };
-      const params = isSmall ? tableSelectedParams : allParameters;
+      const params = isSmall ? tableSelectedParams.filter((_, i) => i < 6) : allParameters;
       const dataValues = isSmall ? smallValues : values;
       const { orthocenter, pointAh, pointBh, pointCh, pointAb, pointBb, pointCb, pointAm, pointBm, pointCm, incenter } = dataValues;
 
       const datasets = [
-        {
-          label: 'Unit Circle',
-          data: circlePoints,
-          borderColor: '#1e90ff',
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }
+        { label: 'Unit Circle', data: circlePoints, borderColor: '#1e90ff', showLine: true, fill: false, pointRadius: 0 }
       ];
 
       if (isSmall) {
-        // Собираем элементы, которые нужно показать
-        const elementsToShow = {
-          A: false, B: false, C: false,
-          AB: false, BC: false, AC: false,
-          AAh: false, BBh: false, CCh: false,
-          AAb: false, BBb: false, CCb: false,
-          AAm: false, BBm: false, CCm: false,
-          inradius: false
-        };
-
-        // Анализируем параметры для определения нужных элементов
+        const elementsToShow = { A:false,B:false,C:false, AB:false,BC:false,AC:false, AAh:false,BBh:false,CCh:false, AAb:false,BBb:false,CCb:false, AAm:false,BBm:false,CCm:false, inradius:false };
         params.forEach(param => {
           if (param.key.includes('sideAB')) elementsToShow.AB = true;
           if (param.key.includes('sideBC')) elementsToShow.BC = true;
           if (param.key.includes('sideAC')) elementsToShow.AC = true;
-          
-          if (param.key.includes('A') && !param.key.includes('Ah') && !param.key.includes('Ab') && !param.key.includes('Am')) elementsToShow.A = true;
-          if (param.key.includes('B') && !param.key.includes('Bh') && !param.key.includes('Bb') && !param.key.includes('Bm')) elementsToShow.B = true;
-          if (param.key.includes('C') && !param.key.includes('Ch') && !param.key.includes('Cb') && !param.key.includes('Cm')) elementsToShow.C = true;
-          
-          if (param.key.includes('altitudeAAh') || param.key.includes('angleBAAh')) elementsToShow.AAh = true;
-          if (param.key.includes('altitudeBBh') || param.key.includes('angleCBBh')) elementsToShow.BBh = true;
-          if (param.key.includes('altitudeCCh') || param.key.includes('angleACCh')) elementsToShow.CCh = true;
-          
-          if (param.key.includes('bisectorAAb') || param.key.includes('angleAAbC') || param.key.includes('angleAAbBBm')) elementsToShow.AAb = true;
-          if (param.key.includes('bisectorBBb') || param.key.includes('angleBBbA') || param.key.includes('angleBBbCCm')) elementsToShow.BBb = true;
-          if (param.key.includes('bisectorCCb') || param.key.includes('angleCCbB') || param.key.includes('angleCCbAAm')) elementsToShow.CCb = true;
-          
-          if (param.key.includes('medianAAm') || param.key.includes('angleAAmC') || param.key.includes('angleCCbAAm')) elementsToShow.AAm = true;
-          if (param.key.includes('medianBBm') || param.key.includes('angleBBmA') || param.key.includes('angleAAbBBm')) elementsToShow.BBm = true;
-          if (param.key.includes('medianCCm') || param.key.includes('angleCCmB') || param.key.includes('angleBBbCCm')) elementsToShow.CCm = true;
-          
           if (param.key.includes('inradius')) elementsToShow.inradius = true;
-          
-          // Для углов добавляем соответствующие стороны
           if (param.key === 'angleBAC') { elementsToShow.AB = true; elementsToShow.AC = true; }
           if (param.key === 'angleABC') { elementsToShow.AB = true; elementsToShow.BC = true; }
           if (param.key === 'angleBCA') { elementsToShow.BC = true; elementsToShow.AC = true; }
+          if (param.key.includes('altitudeAAh') || param.key.includes('angleBAAh')) elementsToShow.AAh = true;
+          if (param.key.includes('altitudeBBh') || param.key.includes('angleCBBh')) elementsToShow.BBh = true;
+          if (param.key.includes('altitudeCCh') || param.key.includes('angleACCh')) elementsToShow.CCh = true;
+          if (param.key.includes('bisectorAAb') || param.key.includes('angleAAbC') || param.key.includes('angleAAbBBm')) elementsToShow.AAb = true;
+          if (param.key.includes('bisectorBBb') || param.key.includes('angleBBbA') || param.key.includes('angleBBbCCm')) elementsToShow.BBb = true;
+          if (param.key.includes('bisectorCCb') || param.key.includes('angleCCbB') || param.key.includes('angleCCbAAm')) elementsToShow.CCb = true;
+          if (param.key.includes('medianAAm') || param.key.includes('angleAAmC') || param.key.includes('angleCCbAAm')) elementsToShow.AAm = true;
+          if (param.key.includes('medianBBm') || param.key.includes('angleBBmA') || param.key.includes('angleAAbBBm')) elementsToShow.BBm = true;
+          if (param.key.includes('medianCCm') || param.key.includes('angleCCmB') || param.key.includes('angleBBbCCm')) elementsToShow.CCm = true;
         });
-
-        // Добавляем вершины, если они нужны
-        if (elementsToShow.A) {
-          datasets.push({
-            label: 'Point A',
-            data: [points.pointA],
-            backgroundColor: '#00ff00',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-        if (elementsToShow.B) {
-          datasets.push({
-            label: 'Point B',
-            data: [points.pointB],
-            backgroundColor: '#ff00ff',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-        if (elementsToShow.C) {
-          datasets.push({
-            label: 'Point C',
-            data: [points.pointC],
-            backgroundColor: '#00ffff',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-
-        // Добавляем стороны
-        if (elementsToShow.AB) {
-          datasets.push({
-            label: 'Side AB',
-            data: [points.pointA, points.pointB],
-            borderColor: '#000000',
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          });
-        }
-        if (elementsToShow.BC) {
-          datasets.push({
-            label: 'Side BC',
-            data: [points.pointB, points.pointC],
-            borderColor: '#000000',
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          });
-        }
-        if (elementsToShow.AC) {
-          datasets.push({
-            label: 'Side AC',
-            data: [points.pointA, points.pointC],
-            borderColor: '#000000',
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          });
-        }
-
-        // Добавляем высоты
-        if (elementsToShow.AAh) {
-          datasets.push({
-            label: 'Altitude A-Ah',
-            data: isRightAngle(points.pointA, points.pointB, points.pointC) ? [pointAh, points.pointA] : [orthocenter, pointAh, points.pointA],
-            borderColor: '#4682b4',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Ah',
-            data: [pointAh],
-            backgroundColor: '#800080',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-        if (elementsToShow.BBh) {
-          datasets.push({
-            label: 'Altitude B-Bh',
-            data: isRightAngle(points.pointB, points.pointA, points.pointC) ? [pointBh, points.pointB] : [orthocenter, pointBh, points.pointB],
-            borderColor: '#4682b4',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Bh',
-            data: [pointBh],
-            backgroundColor: '#800080',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-        if (elementsToShow.CCh) {
-          datasets.push({
-            label: 'Altitude C-Ch',
-            data: isRightAngle(points.pointC, points.pointA, points.pointB) ? [pointCh, points.pointC] : [orthocenter, pointCh, points.pointC],
-            borderColor: '#4682b4',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Ch',
-            data: [pointCh],
-            backgroundColor: '#800080',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-
-        // Добавляем биссектрисы
-        if (elementsToShow.AAb) {
-          datasets.push({
-            label: 'Bisector A-Ab',
-            data: [points.pointA, pointAb],
-            borderColor: '#ff4500',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Ab',
-            data: [pointAb],
-            backgroundColor: '#ff4500',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-        if (elementsToShow.BBb) {
-          datasets.push({
-            label: 'Bisector B-Bb',
-            data: [points.pointB, pointBb],
-            borderColor: '#ff4500',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Bb',
-            data: [pointBb],
-            backgroundColor: '#ff4500',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-        if (elementsToShow.CCb) {
-          datasets.push({
-            label: 'Bisector C-Cb',
-            data: [points.pointC, pointCb],
-            borderColor: '#ff4500',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Cb',
-            data: [pointCb],
-            backgroundColor: '#ff4500',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-
-        // Добавляем медианы
-        if (elementsToShow.AAm) {
-          datasets.push({
-            label: 'Median A-Am',
-            data: [points.pointA, pointAm],
-            borderColor: '#008000',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Am',
-            data: [pointAm],
-            backgroundColor: '#008000',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-        if (elementsToShow.BBm) {
-          datasets.push({
-            label: 'Median B-Bm',
-            data: [points.pointB, pointBm],
-            borderColor: '#008000',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Bm',
-            data: [pointBm],
-            backgroundColor: '#008000',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-        if (elementsToShow.CCm) {
-          datasets.push({
-            label: 'Median C-Cm',
-            data: [points.pointC, pointCm],
-            borderColor: '#008000',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Point Cm',
-            data: [pointCm],
-            backgroundColor: '#008000',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
-
-        // Добавляем вписанную окружность
-        if (elementsToShow.inradius) {
-          datasets.push({
-            label: 'Incircle',
-            data: getIncirclePoints(incenter, dataValues.inradius),
-            borderColor: '#ff0000',
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          }, {
-            label: 'Incenter I',
-            data: [incenter],
-            backgroundColor: '#ff0000',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          });
-        }
+        if (elementsToShow.A) datasets.push({ label:'Point A', data:[points.pointA], backgroundColor:'#00ff00', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.B) datasets.push({ label:'Point B', data:[points.pointB], backgroundColor:'#ff00ff', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.C) datasets.push({ label:'Point C', data:[points.pointC], backgroundColor:'#00ffff', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.AB) datasets.push({ label:'Side AB', data:[points.pointA, points.pointB], borderColor:'#000000', showLine:true, fill:false, pointRadius:0 });
+        if (elementsToShow.BC) datasets.push({ label:'Side BC', data:[points.pointB, points.pointC], borderColor:'#000000', showLine:true, fill:false, pointRadius:0 });
+        if (elementsToShow.AC) datasets.push({ label:'Side AC', data:[points.pointA, points.pointC], borderColor:'#000000', showLine:true, fill:false, pointRadius:0 });
+        if (elementsToShow.AAh) datasets.push({ label:'Altitude A-Ah', data: isRightAngle(points.pointA, points.pointB, points.pointC) ? [pointAh, points.pointA] : [orthocenter, pointAh, points.pointA], borderColor:'#4682b4', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Ah', data:[pointAh], backgroundColor:'#800080', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.BBh) datasets.push({ label:'Altitude B-Bh', data: isRightAngle(points.pointB, points.pointA, points.pointC) ? [pointBh, points.pointB] : [orthocenter, pointBh, points.pointB], borderColor:'#4682b4', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Bh', data:[pointBh], backgroundColor:'#800080', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.CCh) datasets.push({ label:'Altitude C-Ch', data: isRightAngle(points.pointC, points.pointA, points.pointB) ? [pointCh, points.pointC] : [orthocenter, pointCh, points.pointC], borderColor:'#4682b4', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Ch', data:[pointCh], backgroundColor:'#800080', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.AAb) datasets.push({ label:'Bisector A-Ab', data:[points.pointA, pointAb], borderColor:'#ff4500', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Ab', data:[pointAb], backgroundColor:'#ff4500', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.BBb) datasets.push({ label:'Bisector B-Bb', data:[points.pointB, pointBb], borderColor:'#ff4500', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Bb', data:[pointBb], backgroundColor:'#ff4500', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.CCb) datasets.push({ label:'Bisector C-Cb', data:[points.pointC, pointCb], borderColor:'#ff4500', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Cb', data:[pointCb], backgroundColor:'#ff4500', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.AAm) datasets.push({ label:'Median A-Am', data:[points.pointA, pointAm], borderColor:'#008000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Am', data:[pointAm], backgroundColor:'#008000', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.BBm) datasets.push({ label:'Median B-Bm', data:[points.pointB, pointBm], borderColor:'#008000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Bm', data:[pointBm], backgroundColor:'#008000', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.CCm) datasets.push({ label:'Median C-Cm', data:[points.pointC, pointCm], borderColor:'#008000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },{ label:'Point Cm', data:[pointCm], backgroundColor:'#008000', pointRadius:4.25, pointHoverRadius:4.25 });
+        if (elementsToShow.inradius) datasets.push({ label:'Incircle', data:getIncirclePoints(incenter, dataValues.inradius), borderColor:'#ff0000', showLine:true, fill:false, pointRadius:0 },{ label:'Incenter I', data:[incenter], backgroundColor:'#ff0000', pointRadius:4.25, pointHoverRadius:4.25 });
       } else {
-        // Оригинальный код для mainChart
         datasets.push(
-          {
-            label: 'Side AB',
-            data: [points.pointA, points.pointB],
-            borderColor: '#000000',
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          },
-          {
-            label: 'Side BC',
-            data: [points.pointB, points.pointC],
-            borderColor: '#000000',
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          },
-          {
-            label: 'Side AC',
-            data: [points.pointA, points.pointC],
-            borderColor: '#000000',
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          },
-          {
-            label: 'Point A',
-            data: [points.pointA],
-            backgroundColor: '#00ff00',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          },
-          {
-            label: 'Point B',
-            data: [points.pointB],
-            backgroundColor: '#ff00ff',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          },
-          {
-            label: 'Point C',
-            data: [points.pointC],
-            backgroundColor: '#00ffff',
-            pointRadius: 4.25,
-            pointHoverRadius: 4.25
-          }
+          { label:'Side AB', data:[points.pointA, points.pointB], borderColor:'#000000', showLine:true, fill:false, pointRadius:0 },
+          { label:'Side BC', data:[points.pointB, points.pointC], borderColor:'#000000', showLine:true, fill:false, pointRadius:0 },
+          { label:'Side AC', data:[points.pointA, points.pointC], borderColor:'#000000', showLine:true, fill:false, pointRadius:0 },
+          { label:'Point A', data:[points.pointA], backgroundColor:'#00ff00', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Point B', data:[points.pointB], backgroundColor:'#ff00ff', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Point C', data:[points.pointC], backgroundColor:'#00ffff', pointRadius:4.25, pointHoverRadius:4.25 }
         );
-
-        // Добавляем все остальные элементы для mainChart
-        if (shouldExtendLine(points.pointB, points.pointC, pointAh)) {
-          datasets.push({
-            label: 'Extended BC',
-            data: getExtendedLine(points.pointB, points.pointC, pointAh),
-            borderColor: '#000000',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          });
-        }
-
-        if (shouldExtendLine(points.pointA, points.pointC, pointBh)) {
-          datasets.push({
-            label: 'Extended AC',
-            data: getExtendedLine(points.pointA, points.pointC, pointBh),
-            borderColor: '#000000',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          });
-        }
-
-        if (shouldExtendLine(points.pointA, points.pointB, pointCh)) {
-          datasets.push({
-            label: 'Extended AB',
-            data: getExtendedLine(points.pointA, points.pointB, pointCh),
-            borderColor: '#000000',
-            borderDash: [4.25, 4.25],
-            showLine: true,
-            fill: false,
-            pointRadius: 0
-          });
-        }
-
-        datasets.push({
-          label: 'Altitude A-Ah',
-          data: isRightAngle(points.pointA, points.pointB, points.pointC) ? [pointAh, points.pointA] : [orthocenter, pointAh, points.pointA],
-          borderColor: '#4682b4',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Ah',
-          data: [pointAh],
-          backgroundColor: '#800080',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Altitude B-Bh',
-          data: isRightAngle(points.pointB, points.pointA, points.pointC) ? [pointBh, points.pointB] : [orthocenter, pointBh, points.pointB],
-          borderColor: '#4682b4',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Bh',
-          data: [pointBh],
-          backgroundColor: '#800080',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Altitude C-Ch',
-          data: isRightAngle(points.pointC, points.pointA, points.pointB) ? [pointCh, points.pointC] : [orthocenter, pointCh, points.pointC],
-          borderColor: '#4682b4',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Ch',
-          data: [pointCh],
-          backgroundColor: '#800080',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Bisector A-Ab',
-          data: [points.pointA, pointAb],
-          borderColor: '#ff4500',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Ab',
-          data: [pointAb],
-          backgroundColor: '#ff4500',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Bisector B-Bb',
-          data: [points.pointB, pointBb],
-          borderColor: '#ff4500',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Bb',
-          data: [pointBb],
-          backgroundColor: '#ff4500',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Bisector C-Cb',
-          data: [points.pointC, pointCb],
-          borderColor: '#ff4500',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Cb',
-          data: [pointCb],
-          backgroundColor: '#ff4500',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Median A-Am',
-          data: [points.pointA, pointAm],
-          borderColor: '#008000',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Am',
-          data: [pointAm],
-          backgroundColor: '#008000',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Median B-Bm',
-          data: [points.pointB, pointBm],
-          borderColor: '#008000',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Bm',
-          data: [pointBm],
-          backgroundColor: '#008000',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Median C-Cm',
-          data: [points.pointC, pointCm],
-          borderColor: '#008000',
-          borderDash: [4.25, 4.25],
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Point Cm',
-          data: [pointCm],
-          backgroundColor: '#008000',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        }, {
-          label: 'Incircle',
-          data: getIncirclePoints(incenter, dataValues.inradius),
-          borderColor: '#ff0000',
-          showLine: true,
-          fill: false,
-          pointRadius: 0
-        }, {
-          label: 'Incenter I',
-          data: [incenter],
-          backgroundColor: '#ff0000',
-          pointRadius: 4.25,
-          pointHoverRadius: 4.25
-        });
+        if (shouldExtendLine(points.pointB, points.pointC, pointAh)) datasets.push({ label:'Extended BC', data:getExtendedLine(points.pointB, points.pointC, pointAh), borderColor:'#000000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 });
+        if (shouldExtendLine(points.pointA, points.pointC, pointBh)) datasets.push({ label:'Extended AC', data:getExtendedLine(points.pointA, points.pointC, pointBh), borderColor:'#000000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 });
+        if (shouldExtendLine(points.pointA, points.pointB, pointCh)) datasets.push({ label:'Extended AB', data:getExtendedLine(points.pointA, points.pointB, pointCh), borderColor:'#000000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 });
+        datasets.push(
+          { label:'Altitude A-Ah', data:isRightAngle(points.pointA, points.pointB, points.pointC) ? [pointAh, points.pointA] : [orthocenter, pointAh, points.pointA], borderColor:'#4682b4', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Ah', data:[pointAh], backgroundColor:'#800080', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Altitude B-Bh', data:isRightAngle(points.pointB, points.pointA, points.pointC) ? [pointBh, points.pointB] : [orthocenter, pointBh, points.pointB], borderColor:'#4682b4', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Bh', data:[pointBh], backgroundColor:'#800080', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Altitude C-Ch', data:isRightAngle(points.pointC, points.pointA, points.pointB) ? [pointCh, points.pointC] : [orthocenter, pointCh, points.pointC], borderColor:'#4682b4', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Ch', data:[pointCh], backgroundColor:'#800080', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Bisector A-Ab', data:[points.pointA, pointAb], borderColor:'#ff4500', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Ab', data:[pointAb], backgroundColor:'#ff4500', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Bisector B-Bb', data:[points.pointB, pointBb], borderColor:'#ff4500', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Bb', data:[pointBb], backgroundColor:'#ff4500', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Bisector C-Cb', data:[points.pointC, pointCb], borderColor:'#ff4500', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Cb', data:[pointCb], backgroundColor:'#ff4500', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Median A-Am', data:[points.pointA, pointAm], borderColor:'#008000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Am', data:[pointAm], backgroundColor:'#008000', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Median B-Bm', data:[points.pointB, pointBm], borderColor:'#008000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Bm', data:[pointBm], backgroundColor:'#008000', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Median C-Cm', data:[points.pointC, pointCm], borderColor:'#008000', borderDash:[4.25,4.25], showLine:true, fill:false, pointRadius:0 },
+          { label:'Point Cm', data:[pointCm], backgroundColor:'#008000', pointRadius:4.25, pointHoverRadius:4.25 },
+          { label:'Incircle', data:getIncirclePoints(incenter, dataValues.inradius), borderColor:'#ff0000', showLine:true, fill:false, pointRadius:0 },
+          { label:'Incenter I', data:[incenter], backgroundColor:'#ff0000', pointRadius:4.25, pointHoverRadius:4.25 }
+        );
       }
-
       return datasets;
     }
 
     function getChartAnnotations(isSmall = false) {
       const points = isSmall ? { pointA: smallPointA, pointB: smallPointB, pointC: smallPointC } : { pointA, pointB, pointC };
-      const params = isSmall ? tableSelectedParams : allParameters;
+      const params = isSmall ? tableSelectedParams.filter((_, i) => i < 6) : allParameters;
       const dataValues = isSmall ? smallValues : values;
       const { orthocenter, pointAh, pointBh, pointCh, pointAb, pointBb, pointCb, pointAm, pointBm, pointCm, incenter } = dataValues;
-
       const annotations = {};
-
       if (!isSmall || params.some(p => p.designation.includes('A') || p.key.includes('A'))) {
-        annotations.labelA = {
-          type: 'label',
-          xValue: points.pointA.x,
-          yValue: points.pointA.y,
-          content: ['A'],
-          font: { size: 10.2 },
-          color: '#000000',
-          position: 'center',
-          xAdjust: 8.5,
-          yAdjust: -8.5
-        };
+        annotations.labelA = { type:'label', xValue:points.pointA.x, yValue:points.pointA.y, content:['A'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
       }
       if (!isSmall || params.some(p => p.designation.includes('B') || p.key.includes('B'))) {
-        annotations.labelB = {
-          type: 'label',
-          xValue: points.pointB.x,
-          yValue: points.pointB.y,
-          content: ['B'],
-          font: { size: 10.2 },
-          color: '#000000',
-          position: 'center',
-          xAdjust: 8.5,
-          yAdjust: -8.5
-        };
+        annotations.labelB = { type:'label', xValue:points.pointB.x, yValue:points.pointB.y, content:['B'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
       }
       if (!isSmall || params.some(p => p.designation.includes('C') || p.key.includes('C'))) {
-        annotations.labelC = {
-          type: 'label',
-          xValue: points.pointC.x,
-          yValue: points.pointC.y,
-          content: ['C'],
-          font: { size: 10.2 },
-          color: '#000000',
-          position: 'center',
-          xAdjust: 8.5,
-          yAdjust: -8.5
-        };
+        annotations.labelC = { type:'label', xValue:points.pointC.x, yValue:points.pointC.y, content:['C'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
       }
-
       if ((!isSmall || params.some(p => p.key === 'inradius')) && incenter) {
-        annotations.labelI = {
-          type: 'label',
-          xValue: incenter.x,
-          yValue: incenter.y,
-          content: ['I'],
-          font: { size: 10.2 },
-          color: '#000000',
-          position: 'center',
-          xAdjust: 8.5,
-          yAdjust: -8.5
-        };
+        annotations.labelI = { type:'label', xValue:incenter.x, yValue:incenter.y, content:['I'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
       }
-
       params.forEach(param => {
         if ((!isSmall || param.key.includes('altitudeAAh') || param.key.includes('angleBAAh')) && orthocenter && pointAh) {
-          annotations.labelH = {
-            type: 'label',
-            xValue: orthocenter.x,
-            yValue: orthocenter.y,
-            content: ['H'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
-          annotations.labelAh = {
-            type: 'label',
-            xValue: pointAh.x,
-            yValue: pointAh.y,
-            content: ['Ah'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelH = { type:'label', xValue:orthocenter.x, yValue:orthocenter.y, content:['H'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
+          annotations.labelAh = { type:'label', xValue:pointAh.x, yValue:pointAh.y, content:['Ah'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
         if ((!isSmall || param.key.includes('altitudeBBh') || param.key.includes('angleCBBh')) && orthocenter && pointBh) {
-          annotations.labelH = {
-            type: 'label',
-            xValue: orthocenter.x,
-            yValue: orthocenter.y,
-            content: ['H'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
-          annotations.labelBh = {
-            type: 'label',
-            xValue: pointBh.x,
-            yValue: pointBh.y,
-            content: ['Bh'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelH = { type:'label', xValue:orthocenter.x, yValue:orthocenter.y, content:['H'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
+          annotations.labelBh = { type:'label', xValue:pointBh.x, yValue:pointBh.y, content:['Bh'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
         if ((!isSmall || param.key.includes('altitudeCCh') || param.key.includes('angleACCh')) && orthocenter && pointCh) {
-          annotations.labelH = {
-            type: 'label',
-            xValue: orthocenter.x,
-            yValue: orthocenter.y,
-            content: ['H'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
-          annotations.labelCh = {
-            type: 'label',
-            xValue: pointCh.x,
-            yValue: pointCh.y,
-            content: ['Ch'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelH = { type:'label', xValue:orthocenter.x, yValue:orthocenter.y, content:['H'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
+          annotations.labelCh = { type:'label', xValue:pointCh.x, yValue:pointCh.y, content:['Ch'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
         if ((!isSmall || param.key.includes('bisectorAAb') || param.key.includes('angleAAbC') || param.key.includes('angleAAbBBm')) && pointAb) {
-          annotations.labelAb = {
-            type: 'label',
-            xValue: pointAb.x,
-            yValue: pointAb.y,
-            content: ['Ab'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelAb = { type:'label', xValue:pointAb.x, yValue:pointAb.y, content:['Ab'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
         if ((!isSmall || param.key.includes('bisectorBBb') || param.key.includes('angleBBbA') || param.key.includes('angleBBbCCm')) && pointBb) {
-          annotations.labelBb = {
-            type: 'label',
-            xValue: pointBb.x,
-            yValue: pointBb.y,
-            content: ['Bb'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelBb = { type:'label', xValue:pointBb.x, yValue:pointBb.y, content:['Bb'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
         if ((!isSmall || param.key.includes('bisectorCCb') || param.key.includes('angleCCbB') || param.key.includes('angleCCbAAm')) && pointCb) {
-          annotations.labelCb = {
-            type: 'label',
-            xValue: pointCb.x,
-            yValue: pointCb.y,
-            content: ['Cb'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelCb = { type:'label', xValue:pointCb.x, yValue:pointCb.y, content:['Cb'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
         if ((!isSmall || param.key.includes('medianAAm') || param.key.includes('angleAAmC') || param.key.includes('angleCCbAAm')) && pointAm) {
-          annotations.labelAm = {
-            type: 'label',
-            xValue: pointAm.x,
-            yValue: pointAm.y,
-            content: ['Am'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelAm = { type:'label', xValue:pointAm.x, yValue:pointAm.y, content:['Am'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
         if ((!isSmall || param.key.includes('medianBBm') || param.key.includes('angleBBmA') || param.key.includes('angleAAbBBm')) && pointBm) {
-          annotations.labelBm = {
-            type: 'label',
-            xValue: pointBm.x,
-            yValue: pointBm.y,
-            content: ['Bm'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelBm = { type:'label', xValue:pointBm.x, yValue:pointBm.y, content:['Bm'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
         if ((!isSmall || param.key.includes('medianCCm') || param.key.includes('angleCCmB') || param.key.includes('angleBBbCCm')) && pointCm) {
-          annotations.labelCm = {
-            type: 'label',
-            xValue: pointCm.x,
-            yValue: pointCm.y,
-            content: ['Cm'],
-            font: { size: 10.2 },
-            color: '#000000',
-            position: 'center',
-            xAdjust: 8.5,
-            yAdjust: -8.5
-          };
+          annotations.labelCm = { type:'label', xValue:pointCm.x, yValue:pointCm.y, content:['Cm'], font:{ size:10.2 }, color:'#000000', position:'center', xAdjust:8.5, yAdjust:-8.5 };
         }
       });
-
       return annotations;
     }
 
@@ -1397,67 +504,52 @@
       tableBody.innerHTML = '';
       let remainingParams = allParameters.filter(param => !tableSelectedParams.some(selected => selected.key === param.key));
       let displayedParams = [...tableSelectedParams, ...remainingParams];
-
       displayedParams.forEach((param, index) => {
         const row = document.createElement('tr');
-        if (index < 2 && tableIndependent.includes(param.key)) {
+        if (index < 3 && tableIndependent.includes(param.key)) {
           row.classList.add('highlight-independent');
-        } else if (index >= 2 && index < 5 && !tableIndependent.includes(param.key)) {
+        } else if (index >= 3 && index < 6 && !tableIndependent.includes(param.key)) {
           row.classList.add('highlight-input');
         }
         row.innerHTML = `
           <td>${index + 1}</td>
           <td>${param.name}</td>
           <td>${String(param.designation).replace(/,/g,';')}</td>
-          <td>${values[param.key]}</td>
+          <td>${tableValuesLeft[param.key]}</td>
         `;
         tableBody.appendChild(row);
       });
     }
-
     function updateSmallTable() {
       const tableBody = document.getElementById('smallTableBody');
       tableBody.innerHTML = '';
       tableSelectedParams.forEach((param, index) => {
         const isIndependent = tableIndependent.includes(param.key);
         const row = document.createElement('tr');
-        if (isIndependent && index < 2) {
-          row.classList.add('highlight-independent');
-        } else if (!isIndependent && index >= 2) {
-          row.classList.add('highlight-input');
-        }
+        if (isIndependent && index < 3) row.classList.add('highlight-independent');
+        else if (!isIndependent && index >= 3) row.classList.add('highlight-input');
         row.innerHTML = `
           <td>${index + 1}</td>
           <td>${param.name}</td>
           <td>${String(param.designation).replace(/,/g,';')}</td>
-          <td id="${param.key}Cell">${isIndependent ? values[param.key] : `<input type="number" id="${param.key}" step="0.01">`}</td>
+          <td id="${param.key}Cell">${isIndependent ? tableValuesLeft[param.key] : `<input type="number" id="${param.key}" step="0.01">`}</td>
         `;
         tableBody.appendChild(row);
-
         if (!isIndependent) {
           document.getElementById(param.key).addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
               const inputValue = parseFloat(event.target.value);
-              const correctValue = parseFloat(values[param.key]);
+              const correctValue = parseFloat(tableValuesLeft[param.key]);
               const cell = document.getElementById(`${param.key}Cell`);
-              if (isNaN(inputValue)) {
-                cell.innerHTML = `<span class="incorrect">Wrong</span>`;
-                return;
-              }
+              if (isNaN(inputValue)) { cell.innerHTML = `<span class="incorrect">Wrong</span>`; return; }
               const absoluteError = Math.abs(inputValue - correctValue);
               if (absoluteError >= 0.01) {
                 const relativeError = absoluteError / correctValue;
-                if (relativeError <= 0.05) {
-                  cell.innerHTML = `<span class="correct">${inputValue.toFixed(2)}</span>`;
-                } else {
-                  cell.innerHTML = `<span class="incorrect">Wrong</span>`;
-                }
+                if (relativeError <= 0.05) cell.innerHTML = `<span class="correct">${inputValue.toFixed(2)}</span>`;
+                else cell.innerHTML = `<span class="incorrect">Wrong</span>`;
               } else {
-                if (absoluteError <= 0.01) {
-                  cell.innerHTML = `<span class="correct">${inputValue.toFixed(2)}</span>`;
-                } else {
-                  cell.innerHTML = `<span class="incorrect">Wrong</span>`;
-                }
+                if (absoluteError <= 0.01) cell.innerHTML = `<span class="correct">${inputValue.toFixed(2)}</span>`;
+                else cell.innerHTML = `<span class="incorrect">Wrong</span>`;
               }
             }
           });
@@ -1471,7 +563,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'triangle_visualization_with_extensions.html';
+      a.download = 'triangle_visualization_R6_yScale_slider.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1481,11 +573,44 @@
     // Initialize with random points
     let { pointA, pointB, pointC } = getRandomPoints();
     let { pointA: smallPointA, pointB: smallPointB, pointC: smallPointC } = getRandomPoints();
-    let tableParams = getRandomParameters(pointA, pointB, pointC, 5);
+    let tableParams = getRandomParameters(pointA, pointB, pointC, 6);
     let tableSelectedParams = tableParams.selectedParams;
     let tableIndependent = tableParams.independent;
     let values = getOrthocenterAndIntersections(pointA, pointB, pointC);
     let smallValues = getOrthocenterAndIntersections(smallPointA, smallPointB, smallPointC);
+
+    // --- BEGIN: Scaled copies for tables only (R=2) ---
+    function getRandomR(){ const choices=[0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]; return choices[Math.floor(Math.random()*choices.length)]; }
+let R = getRandomR();
+    function scaleForTables(baseVals, Rfac) {
+      const out = { ...baseVals };
+      const linearKeys = [
+        'sideAB','sideBC','sideAC',
+        'altitudeAAh','altitudeBBh','altitudeCCh',
+        'bisectorAAb','bisectorBBb','bisectorCCb',
+        'medianAAm','medianBBm','medianCCm',
+        'inradius','circumradius'
+      ];
+      for (const k of linearKeys) {
+        if (out[k] !== undefined && out[k] !== null) {
+          const num = parseFloat(out[k]);
+          if (!Number.isNaN(num)) out[k] = (num * Rfac).toFixed(2);
+        }
+      }
+      if (out['area'] !== undefined && out['area'] !== null) {
+        const numA = parseFloat(out['area']);
+        if (!Number.isNaN(numA)) out['area'] = (numA * Rfac * Rfac).toFixed(2);
+      }
+      return out;
+    }
+    let tableValuesLeft = scaleForTables(values, R);
+    let tableValuesRight = scaleForTables(smallValues, R);
+    // --- END: Scaled copies for tables only ---
+
+    // Base ranges for Y scaling
+    const BASE_Y_MAX = 1.5;
+    const BASE_Y_MIN = -1.5;
+    const BASE_STEP = 0.5;
 
     // Initialize charts
     updateMainTable();
@@ -1495,31 +620,16 @@
     const smallCtx = document.getElementById('smallChart').getContext('2d');
     let chart = new Chart(ctx, {
       type: 'scatter',
-      data: {
-        datasets: getChartDatasets()
-      },
+      data: { datasets: getChartDatasets() },
       options: {
         scales: {
-          x: {
-            type: 'linear',
-            min: -1.5,
-            max: 1.5,
-            title: { display: true, text: 'x' }
-          },
-          y: {
-            type: 'linear',
-            min: -1.5,
-            max: 1.5,
-            ticks: { stepSize: 0.5 },
-            title: { display: true, text: 'y' }
-          }
+          x: { type: 'linear', min: -1.5, max: 1.5, ticks:{display:false}, title: { display: true, text: 'x' } },
+          y: { type: 'linear', min: BASE_Y_MIN, max: BASE_Y_MAX, ticks: { stepSize: BASE_STEP, color:'white' }, title: { display: true, text: 'y' } }
         },
         plugins: {
           legend: { display: false },
           tooltip: { enabled: false },
-          annotation: {
-            annotations: getChartAnnotations()
-          }
+          annotation: { annotations: getChartAnnotations() }
         },
         aspectRatio: 1
       }
@@ -1527,42 +637,62 @@
 
     let smallChart = new Chart(smallCtx, {
       type: 'scatter',
-      data: {
-        datasets: getChartDatasets(true)
-      },
+      data: { datasets: getChartDatasets(true) },
       options: {
         scales: {
-          x: {
-            type: 'linear',
-            min: -1.5,
-            max: 1.5,
-            title: { display: true, text: 'x' }
-          },
-          y: {
-            type: 'linear',
-            min: -1.5,
-            max: 1.5,
-            ticks: { stepSize: 0.5 },
-            title: { display: true, text: 'y' }
-          }
+          x: { type: 'linear', min: -1.5, max: 1.5, ticks:{display:false}, title: { display: true, text: 'x' } },
+          y: { type: 'linear', min: BASE_Y_MIN, max: BASE_Y_MAX, ticks: { stepSize: BASE_STEP, color:'white' }, title: { display: true, text: 'y' } }
         },
         plugins: {
           legend: { display: false },
           tooltip: { enabled: false },
-          annotation: {
-            annotations: getChartAnnotations(true)
-          }
+          annotation: { annotations: getChartAnnotations(true) }
         },
         aspectRatio: 1
       }
     });
 
-    function updateCharts() {
-      const yStep = parseFloat(document.getElementById('yStep').value);
-      chart.options.scales.y.ticks.stepSize = yStep;
-      smallChart.options.scales.y.ticks.stepSize = yStep;
+    function applyYScale(scalePercent) {
+      const label = document.getElementById('yScaleLabel');
+      label.textContent = scalePercent + "%";
+      const s = scalePercent / 100; // s>1 means zoom-in vertically
+      const newMax = BASE_Y_MAX / s;
+      const newMin = BASE_Y_MIN / s;
+      const newStep = BASE_STEP / s; // keep grid density visually consistent
+      chart.options.scales.y.max = newMax;
+      chart.options.scales.y.min = newMin;
+      chart.options.scales.y.ticks.stepSize = newStep;
+      smallChart.options.scales.y.max = newMax;
+      smallChart.options.scales.y.min = newMin;
+      smallChart.options.scales.y.ticks.stepSize = newStep;
       chart.update();
       smallChart.update();
+      _applyCircumVisibility();
+    }
+
+    // Hook slider
+    const yScaleEl = document.getElementById('yScale');
+    yScaleEl.addEventListener('input', (e) => applyYScale(parseInt(e.target.value, 10)));
+
+    // Initialize scale
+    applyYScale(90);
+
+    // Regenerate on Delete
+    
+    // ---- Post-render visibility control for the RIGHT chart's circumcircle ----
+    function _circumAllowed() {
+      try { return tableSelectedParams.slice(0,6).some(p => p.key === 'circumradius'); }
+      catch(e){ return false; }
+    }
+    function _applyCircumVisibility() {
+      try {
+        if (smallChart && smallChart.data && Array.isArray(smallChart.data.datasets)) {
+          smallChart.data.datasets.forEach(ds => {
+            if (ds && ds.label === 'Unit Circle') ds.hidden = !_circumAllowed();
+          });
+          smallChart.update();
+        }
+      } catch(e) { /* silent */ }
     }
 
     document.addEventListener('keydown', (event) => {
@@ -1575,12 +705,14 @@
         smallPointA = smallPoints.pointA;
         smallPointB = smallPoints.pointB;
         smallPointC = smallPoints.pointC;
-        tableParams = getRandomParameters(pointA, pointB, pointC, 5);
+        tableParams = getRandomParameters(pointA, pointB, pointC, 6);
         tableSelectedParams = tableParams.selectedParams;
         tableIndependent = tableParams.independent;
         values = getOrthocenterAndIntersections(pointA, pointB, pointC);
         smallValues = getOrthocenterAndIntersections(smallPointA, smallPointB, smallPointC);
-
+        R = getRandomR();
+        tableValuesLeft = scaleForTables(values, R);
+        tableValuesRight = scaleForTables(smallValues, R);
         updateMainTable();
         updateSmallTable();
         chart.data.datasets = getChartDatasets();
@@ -1589,8 +721,9 @@
         smallChart.options.plugins.annotation.annotations = getChartAnnotations(true);
         chart.update();
         smallChart.update();
+        _applyCircumVisibility();
       }
     });
-  </script><div id="goog-gt-tt" class="VIpgJd-yAWNEb-L7lbkb skiptranslate" style="border-radius: 12px; margin: 0 0 0 -23px; padding: 0; font-family: 'Google Sans', Arial, sans-serif;" data-id=""><div id="goog-gt-vt" class="VIpgJd-yAWNEb-hvhgNd"><div class="VIpgJd-yAWNEb-hvhgNd-Ud7fr"><img src="https://fonts.gstatic.com/s/i/productlogos/translate/v14/24px.svg" width="24" height="24" alt=""><div class=" VIpgJd-yAWNEb-hvhgNd-IuizWc-i3jM8c " dir="ltr">Исходный текст</div></div><div class="VIpgJd-yAWNEb-hvhgNd-k77Iif"><div id="goog-gt-original-text" class="VIpgJd-yAWNEb-nVMfcd-fmcmS VIpgJd-yAWNEb-hvhgNd-axAV1"></div></div><div class="VIpgJd-yAWNEb-hvhgNd-N7Eqid ltr"><div class="VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od ltr" dir="ltr"><div class="VIpgJd-yAWNEb-hvhgNd-UTujCb">Оцените этот перевод</div><div class="VIpgJd-yAWNEb-hvhgNd-eO9mKe">Ваш отзыв поможет нам улучшить Google Переводчик</div></div><div class="VIpgJd-yAWNEb-hvhgNd-xgov5 ltr"><button id="goog-gt-thumbUpButton" type="button" class="VIpgJd-yAWNEb-hvhgNd-bgm6sf" title="Хороший перевод" aria-label="Хороший перевод" aria-pressed="false"><span id="goog-gt-thumbUpIcon"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M21 7h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 0S7.08 6.85 7 7H2v13h16c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9c0-1.1-.9-2-2-2zM7 18H4V9h3v9zm14-7l-3 7H9V8l4.34-4.34L12 9h9v2z"></path></svg></span><span id="goog-gt-thumbUpIconFilled"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M21 7h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 0S7.08 6.85 7 7v13h11c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9c0-1.1-.9-2-2-2zM5 7H1v13h4V7z"></path></svg></span></button><button id="goog-gt-thumbDownButton" type="button" class="VIpgJd-yAWNEb-hvhgNd-bgm6sf" title="Плохой перевод" aria-label="Плохой перевод" aria-pressed="false"><span id="goog-gt-thumbDownIcon"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M3 17h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 24s7.09-6.85 7.17-7h5V4H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2zM17 6h3v9h-3V6zM3 13l3-7h9v10l-4.34 4.34L12 15H3v-2z"></path></svg></span><span id="goog-gt-thumbDownIconFilled"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M3 17h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 24s7.09-6.85 7.17-7V4H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2zm16 0h4V4h-4v13z"></path></svg></span></button></div></div><div id="goog-gt-votingHiddenPane" class="VIpgJd-yAWNEb-hvhgNd-aXYTce"><form id="goog-gt-votingForm" action="//translate.googleapis.com/translate_voting?client=te_lib" method="post" target="votingFrame" class="VIpgJd-yAWNEb-hvhgNd-aXYTce"><input type="text" name="sl" id="goog-gt-votingInputSrcLang"><input type="text" name="tl" id="goog-gt-votingInputTrgLang"><input type="text" name="query" id="goog-gt-votingInputSrcText"><input type="text" name="gtrans" id="goog-gt-votingInputTrgText"><input type="text" name="vote" id="goog-gt-votingInputVote"></form><iframe name="votingFrame" frameborder="0"></iframe></div></div></div>
-
-</body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>
+  </script>
+</body>
+</html>
